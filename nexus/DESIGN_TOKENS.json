@@ -1,0 +1,74 @@
+{
+  "name": "mObywatel NEXUS",
+  "version": "1",
+  "radius": "2px",
+  "space": [4, 8, 12, 16, 24, 32, 48],
+  "font": {
+    "sans": "IBM Plex Sans",
+    "serif": "IBM Plex Serif",
+    "bodySize": "1rem",
+    "bodyLine": 1.5,
+    "headingLine": 1.15,
+    "scaleSteps": [1, 1.25, 1.5, 1.75, 2]
+  },
+  "themes": {
+    "porcelain": {
+      "bg": "#f3efe6",
+      "surface": "#fbf8f2",
+      "fg": "#172033",
+      "muted": "#5c564c",
+      "line": "#d5cec1",
+      "action": "#1c4b82",
+      "actionFg": "#f7f5f0",
+      "actionHover": "#163864",
+      "red": "#8e2432",
+      "onRed": "#fff8f6",
+      "ok": "#1b5e45",
+      "warn": "#8a4b12",
+      "engraving": "#172033",
+      "focus": "#1c4b82",
+      "soft": "#efeae0"
+    },
+    "midnight": {
+      "bg": "#0c1422",
+      "surface": "#141c2c",
+      "fg": "#f3ede2",
+      "muted": "#c8bba6",
+      "line": "#314058",
+      "action": "#8ec8f5",
+      "actionFg": "#0c1422",
+      "actionHover": "#b7daf8",
+      "red": "#f0b7c0",
+      "onRed": "#2a1218",
+      "ok": "#9ed4bc",
+      "warn": "#e6c48a",
+      "engraving": "#c6b48a",
+      "focus": "#ffd56a",
+      "soft": "#1b2638"
+    },
+    "contrast": {
+      "bg": "#ffffff",
+      "surface": "#ffffff",
+      "fg": "#000000",
+      "muted": "#1a1a1a",
+      "line": "#000000",
+      "action": "#000000",
+      "actionFg": "#ffffff",
+      "actionHover": "#1a1a1a",
+      "red": "#000000",
+      "onRed": "#ffffff",
+      "ok": "#000000",
+      "warn": "#000000",
+      "engraving": "#000000",
+      "focus": "#ffbf00",
+      "soft": "#ffffff",
+      "decorative": false
+    }
+  },
+  "motion": {
+    "enter": "180ms cubic-bezier(0.2, 0, 0, 1)",
+    "press": "scale(0.96) 140ms",
+    "fold": "220ms cubic-bezier(0.2, 0, 0, 1)",
+    "orbitTurn": "72deg 680ms once"
+  }
+}
