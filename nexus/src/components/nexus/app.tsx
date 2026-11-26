@@ -2,6 +2,8 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { civicDay } from "@/lib/nexus/format";
 import { useNexus, useNexusHydrated } from "@/lib/nexus/store";
 import { DocumentDetail, DocumentList } from "./documents";
+import { AgencyScreen, CivicCaseDetail, CivicDocumentDetail, CivicNotifications } from "./civic/shared";
+import { civicId } from "./civic/navigation";
 import { DemoDock } from "./demo-dock";
 import { DriverHub, HealthHub, Profile, ServiceCatalog } from "./hubs";
 import type { DemoStoryId } from "@/lib/nexus/types";
@@ -67,6 +69,10 @@ function ThemeSync() {
 function Screen() {
   const view = useNexus((s) => s.view);
   const id = useNexus((s) => s.selectedId);
+  if (view === "urzad") return <AgencyScreen id={id ?? ""} />;
+  if (view === "powiadomienia") return <CivicNotifications initial={id} />;
+  if (view === "sprawa" && id && civicId(id)) return <CivicCaseDetail id={id} />;
+  if (view === "pismo" && id && civicId(id)) return <CivicDocumentDetail id={id} />;
   if (view === "uslugi") return <ServiceCatalog />;
   if (view === "zdrowie") return <HealthHub section={id} />;
   if (view === "kierowca") return <DriverHub section={id} />;
@@ -119,7 +125,7 @@ function Live() {
   const demoStoryId = useNexus((s) => s.demoStoryId);
   const view = useNexus((s) => s.view);
   const id = useNexus((s) => s.selectedId);
-  const key = `${view}:${id ?? ""}`;
+  const key = ["sprawy", "pisma", "powiadomienia"].includes(view) ? view : `${view}:${id ?? ""}`;
   const ref = useRef<HTMLDivElement>(null);
   const first = useRef(true);
   const demoBooted = useRef(false);
@@ -145,18 +151,17 @@ function Live() {
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (view === "sprawa" && id?.startsWith("plan-")) {
-      el.scrollTop = 0;
-    } else {
-      el.scrollTop = scrolls.get(key) ?? 0;
-    }
+    el.scrollTo({
+      top: view === "sprawa" && id?.startsWith("plan-") ? 0 : scrolls.get(key) ?? 0,
+      behavior: "instant",
+    });
     return () => {
       scrolls.set(key, el.scrollTop);
     };
   }, [key, view, id]);
 
   useLayoutEffect(() => {
-    if (ref.current) ref.current.scrollTop = 0;
+    ref.current?.scrollTo({ top: 0, behavior: "instant" });
   }, [demoStoryId]);
 
   useEffect(() => {

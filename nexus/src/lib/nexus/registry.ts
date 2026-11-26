@@ -83,6 +83,30 @@ export const HUBS: HubMeta[] = [
  */
 export const SERVICES: ServiceDef[] = [
   {
+    id: "sady", name: "Sprawy sądowe", description: "Udostępnione sprawy, dokumenty i posiedzenia",
+    category: "Moje sprawy", hub: "sprawy", glyph: "court", institution: "Sądy",
+    availability: "simulated", scopeNote: "Dane fikcyjne. Doręczenia urzędowe obsługuje Portal Informacyjny.",
+    view: "urzad", selectedId: "sady/home", source: "https://portal.wroclaw.sa.gov.pl/",
+  },
+  {
+    id: "praca", name: "Praca i urząd pracy", description: "Sprawy, dokumenty, wizyty i oferty",
+    category: "Życie i praca", hub: "sprawy", glyph: "work", institution: "praca.gov.pl",
+    availability: "simulated", scopeNote: "Lokalne scenariusze e-Urzędu i osobne oferty demo ePraca.",
+    view: "urzad", selectedId: "praca/home", source: "https://www.praca.gov.pl/eurzad/strona-glowna",
+  },
+  {
+    id: "zus", name: "ZUS — ubezpieczenia i świadczenia", description: "Składki, świadczenia, pisma i wizyty",
+    category: "Emerytura i wsparcie", hub: "wsparcie", glyph: "institution", institution: "ZUS",
+    availability: "simulated", scopeNote: "Dane demonstracyjne. Odbiór urzędowy odbywa się w eZUS.",
+    view: "urzad", selectedId: "zus/home", source: "https://www.zus.pl/ezus/logowanie",
+  },
+  {
+    id: "pfron", name: "Wsparcie PFRON", description: "Wnioski, dokumenty i informacje o wsparciu",
+    category: "Emerytura i wsparcie", hub: "wsparcie", glyph: "support", institution: "SOW PFRON",
+    availability: "simulated", scopeNote: "Dane fikcyjne. Poprawki, wiadomości i podpisy są symulowane.",
+    view: "urzad", selectedId: "pfron/home", source: "https://www.pfron.org.pl/",
+  },
+  {
     id: "mdowod",
     name: "mDowód",
     description: "Pokaż dokument tożsamości",

@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { agencyNames, visible, warsaw } from "@/lib/nexus/civic/model";
+import { caseVisible, useAgencySchedule, useCivicData, visibleEvents } from "@/lib/nexus/civic/select";
+import { civicGlyph } from "./civic/navigation";
+import { Field, TaskRows } from "./civic/ui";
 import {
   ALARMS,
   BENEFITS,
@@ -39,6 +43,10 @@ const BENEFIT_TONE = {
 export function CaseList() {
   const state = useNexus();
   const cases = selectDerivedCases(state);
+  const sources = useCivicData();
+  const source = state.selectedId ?? "all";
+  const agencyCases = sources.flatMap((data) => data.cases.filter((item) => visible(data, item) && (source === "all" || source === item.source)));
+  const agencyTasks = sources.flatMap((data) => data.tasks.filter((item) => visible(data, item) && caseVisible(data, item.caseId) && !item.completedAt && (source === "all" || source === item.source)));
   return (
     <div className="nx-stage">
       <Watermark motif="civic" />
@@ -47,8 +55,17 @@ export function CaseList() {
         title="To, co jest w toku"
         lede="Sprawy aktualizują się na żywo po odpowiedziach na pisma, ukończonych ścieżkach i planach ułożonych w „W czym mogę pomóc?”."
       />
+      <Field label="Źródło sprawy">{(field) => <select {...field} value={source} onChange={(e) => state.select(e.target.value === "all" ? undefined : e.target.value)}>
+        <option value="all">Wszystkie</option><option value="nexus">Wzory NEXUS</option>
+        {sources.map((data) => <option key={data.source} value={data.source}>{agencyNames[data.source]}</option>)}
+      </select>}</Field>
+      {agencyTasks.length > 0 && <section className="civic-stack"><h2>Zadania w OneFlow</h2><TaskRows tasks={agencyTasks} /></section>}
       <div className="nx-list">
-        {cases.map((item) => (
+        {agencyCases.map((item) => <Row key={item.id} glyph={civicGlyph[item.source]} title={item.title}
+          meta={`${agencyNames[item.source]} · ${item.sourceStatus ?? "Brak informacji o rozstrzygnięciu"} · ${warsaw(item.updatedAt)}`}
+          onClick={() => state.go("sprawa", item.id)} />)}
+        {source !== "all" && source !== "nexus" && agencyCases.length === 0 && <p>Brak spraw z tego źródła w bieżącym kontekście.</p>}
+        {(source === "all" || source === "nexus") && cases.map((item) => (
           <button
             key={item.id}
             type="button"
@@ -473,6 +490,10 @@ export function Benefits() {
         title="Potencjalne świadczenia i ulgi"
         lede="Oddzielamy potwierdzone dane ze wzoru od świadczeń, które warto dopiero sprawdzić. Prototyp nie wydaje decyzji urzędowych."
       />
+      <div className="nx-list">
+        <Row glyph="institution" title="ZUS — ubezpieczenia i świadczenia" onClick={() => go("urzad", "zus/home")} />
+        <Row glyph="support" title="Wsparcie PFRON" onClick={() => go("urzad", "pfron/home")} />
+      </div>
       <div className="nx-stack">
         {BENEFITS.map((item, index) => (
           <article
@@ -575,7 +596,17 @@ export function Benefits() {
 
 export function Timeline() {
   const state = useNexus();
-  const items = selectUnifiedTimeline(state);
+  const sources = useCivicData();
+  const schedule = useAgencySchedule();
+  const items = [
+    ...selectUnifiedTimeline(state),
+    ...sources.flatMap((data) => visibleEvents(data).map((entry) => ({
+      id: entry.id, sortAt: entry.at, dateLabel: warsaw(entry.at, true), title: entry.title,
+      meta: agencyNames[entry.source], glyph: civicGlyph[entry.source], source: "event" as const,
+      targetView: entry.target.kind === "case" ? "sprawa" as const : entry.target.kind === "document" ? "pismo" as const : "urzad" as const,
+      targetId: entry.target.id, receiptCode: undefined,
+    }))),
+  ].sort((a, b) => Date.parse(b.sortAt) - Date.parse(a.sortAt));
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editDate, setEditDate] = useState("2026-12-04");
   const [editTime, setEditTime] = useState("09:00");
@@ -588,6 +619,11 @@ export function Timeline() {
         lede="Od najnowszego. Odpowiedzi na pisma, przypomnienia z mojeIKP, zapisane ścieżki i historia ze wzoru — kliknij dowolny wpis, aby przejść dalej."
       />
 
+      {schedule.length > 0 && <section className="civic-stack" aria-label="Wizyty i przypomnienia usług">
+        <h2>Wizyty i przypomnienia usług</h2>
+        <div className="nx-list">{schedule.map((item) => <Row key={item.id} glyph="calendar" title={item.label}
+          meta={`${agencyNames[item.agency]} · ${warsaw(item.at, true)}`} onClick={() => state.go("urzad", item.targetId)} />)}</div>
+      </section>}
       {state.reminders.length > 0 ? (
         <section className="nx-stack" aria-label="Twoje przypomnienia">
           <p className="nx-kicker">Aktywne przypomnienia ({state.reminders.length})</p>

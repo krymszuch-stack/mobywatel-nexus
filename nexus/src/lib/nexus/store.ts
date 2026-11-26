@@ -42,6 +42,7 @@ type Live = {
 type Actions = {
   go: (view: ViewId, id?: string) => void;
   back: () => void;
+  select: (id: string | undefined) => void;
   tab: (view: ViewId) => void;
   setTheme: (theme: ThemeName) => void;
   setMode: (mode: HomeMode) => void;
@@ -146,6 +147,7 @@ export const useNexus = create<OneFlowPersisted & Live & Actions>()(
           orbit: false,
           more: false,
         })),
+      select: (selectedId) => set({ selectedId }),
       back: () =>
         set((s) => {
           const prev = s.stack[s.stack.length - 1];

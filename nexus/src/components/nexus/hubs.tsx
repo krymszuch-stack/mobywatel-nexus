@@ -1,3 +1,4 @@
+import { ZusHealthSource } from "./civic/zus";
 import { useMemo, useState } from "react";
 import {
   DOCUMENTS,
@@ -172,6 +173,7 @@ export function HealthHub({ section }: { section?: string }) {
         title="Twoje zdrowie w jednym miejscu"
         lede="Podgląd w prototypie bez porad medycznych i bez rezerwacji wizyt. Prawdziwe recepty i terminy obsługuje pacjent.gov.pl."
       />
+      <ZusHealthSource compact />
 
       <div className="nx-filters" role="tablist" aria-label="Zakładki zdrowia">
         {(

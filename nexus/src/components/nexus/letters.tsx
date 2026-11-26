@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { agencyNames, visible, warsaw } from "@/lib/nexus/civic/model";
+import { caseVisible, useCivicData } from "@/lib/nexus/civic/select";
+import { Field } from "./civic/ui";
 import { LETTERS } from "@/lib/nexus/data";
 import { plDate } from "@/lib/nexus/format";
 import {
@@ -17,6 +20,11 @@ export function LetterList() {
   const readIds = useNexus((s) => s.readIds);
   const replies = useNexus((s) => s.replies);
   const drafts = useNexus((s) => s.drafts);
+  const all = useCivicData();
+  const initial = useNexus((s) => s.selectedId);
+  const source = initial ?? "all";
+  const selectSource = useNexus((s) => s.select);
+  const docs = all.flatMap((data) => data.documents.filter((doc) => visible(data, doc) && caseVisible(data, doc.caseId) && (source === "all" || source === doc.source)));
   const [filter, setFilter] = useState<"act" | "info" | "done">("act");
   const rows = LETTERS.filter((letter) => {
     const phase = letterPhase(letter, readIds, replies);
@@ -28,9 +36,18 @@ export function LetterList() {
     <div className="nx-stage">
       <PageHead
         kicker="e-Doręczenia"
-        title="Moje pisma"
+        title="Pisma z urzędów"
         lede="Podgląd skrzynki z wyjaśnieniem po ludzku, szkicami i lokalnym potwierdzeniem. Nic nie wychodzi do urzędu."
       />
+      <Field label="Źródło pisma">{(field) => <select {...field} value={source} onChange={(e) => selectSource(e.target.value === "all" ? undefined : e.target.value)}>
+        <option value="all">Wszystkie</option><option value="nexus">e-Doręczenia</option>
+        {all.map((data) => <option key={data.source} value={data.source}>{agencyNames[data.source]}</option>)}
+      </select>}</Field>
+      {source !== "nexus" && <div className="nx-list">
+        {docs.map((doc) => <Row key={doc.id} glyph="letter" title={doc.title} meta={`${agencyNames[doc.source]} · ${warsaw(doc.publishedAt)}`} onClick={() => go("pismo", doc.id)} />)}
+        {source !== "all" && !docs.length && <p>Brak pism z tego źródła w bieżącym kontekście.</p>}
+      </div>}
+      {(source === "all" || source === "nexus") && <>
       <div className="nx-filters" role="tablist" aria-label="Filtr pism">
         <button
           type="button"
@@ -111,6 +128,7 @@ export function LetterList() {
           gov.pl/web/e-doreczenia (otwiera stronę poza prototypem)
         </a>
       </p>
+      </>}
     </div>
   );
 }

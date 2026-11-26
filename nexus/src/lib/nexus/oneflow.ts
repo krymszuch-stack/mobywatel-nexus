@@ -137,6 +137,8 @@ const VALID_VIEWS = new Set<ViewId>([
   "zdrowie",
   "kierowca",
   "profil",
+  "urzad",
+  "powiadomienia",
 ]);
 
 export function createFreshPersisted(): OneFlowPersisted {

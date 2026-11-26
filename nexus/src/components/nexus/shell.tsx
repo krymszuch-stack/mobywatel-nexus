@@ -8,6 +8,7 @@ import { Glyph, type GlyphName } from "./glyph";
 import { Mark } from "./heritage";
 import { openLetterCount } from "./letters-state";
 import { Status } from "./ui";
+import { useUnreadCivicNotices } from "@/lib/nexus/civic/select";
 
 const TABS: { id: ViewId | "szukaj"; label: string; glyph: GlyphName }[] = [
   { id: "start", label: "Start", glyph: "start" },
@@ -105,6 +106,9 @@ export function SideNav() {
 }
 
 export function TopBar() {
+  const unread = useUnreadCivicNotices();
+  const onboarded = useNexus((s) => s.onboarded);
+  const go = useNexus((s) => s.go);
   const stack = useNexus((s) => s.stack);
   const back = useNexus((s) => s.back);
   const setOrbit = useNexus((s) => s.setOrbit);
@@ -118,11 +122,17 @@ export function TopBar() {
       ) : (
         <Mark />
       )}
-      <p className="nx-brand">
-        <strong>mObywatel</strong>
-        <small>NEXUS</small>
-      </p>
-      <span className="nx-specimen">WZÓR</span>
+      <div className="nx-top-identity">
+        <p className="nx-brand">
+          <strong>mObywatel</strong>
+          <small>NEXUS</small>
+        </p>
+        <span className="nx-specimen">WZÓR</span>
+      </div>
+      {onboarded && <button type="button" className="nx-iconbtn civic-bell" onClick={() => go("powiadomienia")} aria-label={`Powiadomienia, nieprzeczytane: ${unread}`}>
+        <Glyph name="bell" />
+        {unread > 0 && <span aria-hidden="true" className="civic-bell-count">{unread}</span>}
+      </button>}
       <button
         type="button"
         className="nx-iconbtn"
@@ -152,6 +162,7 @@ export function TabBar() {
               ? profileViews.has(view)
               : item.id === "uslugi"
                 ? view === "uslugi" ||
+                  view === "urzad" ||
                   view === "zdrowie" ||
                   view === "kierowca" ||
                   view === "zalatw" ||

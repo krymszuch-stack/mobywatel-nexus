@@ -119,6 +119,7 @@ export function ConfirmDialog({
   confirm,
   onConfirm,
   danger,
+  restoreFocus,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -127,12 +128,17 @@ export function ConfirmDialog({
   confirm: string;
   onConfirm: () => void;
   danger?: boolean;
+  restoreFocus?: () => void;
 }) {
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="nx-overlay" />
-        <Dialog.Content className="nx-dialog" aria-describedby="nx-dialog-body">
+        <Dialog.Content className="nx-dialog" aria-describedby="nx-dialog-body" onCloseAutoFocus={(event) => {
+          if (!restoreFocus) return;
+          event.preventDefault();
+          restoreFocus();
+        }}>
           <span className="nx-grab" aria-hidden="true" />
           <Dialog.Title className="nx-dialog-title">{title}</Dialog.Title>
           <Dialog.Description id="nx-dialog-body" className="nx-lede">
