@@ -1,0 +1,19 @@
+{
+  "name": "mobywatel-nexus-workspace",
+  "private": true,
+  "workspaces": [
+    "nexus"
+  ],
+  "overrides": {
+    "nf3": "0.3.17"
+  },
+  "scripts": {
+    "dev": "npm --prefix nexus run dev",
+    "build": "npm --prefix nexus run build",
+    "start": "HOST=${HOST:-0.0.0.0} node nexus/.output/server/index.mjs",
+    "preview": "npm --prefix nexus run preview",
+    "lint": "npm --prefix nexus run lint",
+    "typecheck": "npm --prefix nexus run typecheck",
+    "test": "npm --prefix nexus run test"
+  }
+}

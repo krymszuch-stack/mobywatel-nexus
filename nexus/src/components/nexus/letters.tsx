@@ -1,23 +1,22 @@
 import { useEffect, useState } from "react";
 import { LETTERS } from "@/lib/nexus/data";
 import { plDate } from "@/lib/nexus/format";
+import {
+  formatEventTime,
+  selectLetterReceipt,
+  selectRelatedLinksForLetter,
+} from "@/lib/nexus/oneflow";
 import { useNexus } from "@/lib/nexus/store";
+import { Glyph } from "./glyph";
 import { Watermark } from "./heritage";
 import { letterPhase } from "./letters-state";
-import { ConfirmDialog, Missing, PageHead, Status } from "./ui";
-import { Glyph } from "./glyph";
-
-const TONE = {
-  nowe: "info",
-  "wymaga odpowiedzi": "warn",
-  odpowiedziane: "ok",
-  przeczytane: "ok",
-} as const;
+import { ConfirmDialog, Missing, PageHead, Row } from "./ui";
 
 export function LetterList() {
   const go = useNexus((s) => s.go);
   const readIds = useNexus((s) => s.readIds);
   const replies = useNexus((s) => s.replies);
+  const drafts = useNexus((s) => s.drafts);
   const [filter, setFilter] = useState<"act" | "info" | "done">("act");
   const rows = LETTERS.filter((letter) => {
     const phase = letterPhase(letter, readIds, replies);
@@ -30,30 +29,69 @@ export function LetterList() {
       <PageHead
         kicker="e-Doręczenia"
         title="Moje pisma"
-        lede="Podgląd skrzynki. Nic stąd nie wychodzi do prawdziwego urzędu."
+        lede="Podgląd skrzynki z wyjaśnieniem po ludzku, szkicami i lokalnym potwierdzeniem. Nic nie wychodzi do urzędu."
       />
-      <div className="nx-filters" role="tablist">
-        <button type="button" aria-selected={filter === "act"} onClick={() => setFilter("act")}>
+      <div className="nx-filters" role="tablist" aria-label="Filtr pism">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === "act"}
+          onClick={() => setFilter("act")}
+        >
           Do załatwienia
         </button>
-        <button type="button" aria-selected={filter === "info"} onClick={() => setFilter("info")}>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === "info"}
+          onClick={() => setFilter("info")}
+        >
           Informacje
         </button>
-        <button type="button" aria-selected={filter === "done"} onClick={() => setFilter("done")}>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={filter === "done"}
+          onClick={() => setFilter("done")}
+        >
           Załatwione
         </button>
       </div>
       <div className="nx-mail-list">
-        {rows.length === 0 ? <p className="nx-fine">Nie masz pisma, które wymaga ruchu.</p> : null}
+        {rows.length === 0 ? (
+          <p className="nx-fine">
+            {filter === "act"
+              ? "Nie masz pisma wymagającego odpowiedzi."
+              : filter === "done"
+                ? "Nie masz jeszcze zapisanych odpowiedzi."
+                : "Brak pism informacyjnych w tej zakładce."}
+          </p>
+        ) : null}
         {rows.map((letter) => {
           const phase = letterPhase(letter, readIds, replies);
           const kind = phase === "wymaga odpowiedzi" ? "act" : phase === "nowe" ? "info" : "done";
-          const label = phase === "wymaga odpowiedzi" ? "Wymaga działania" : phase === "nowe" ? "Informacja" : phase === "odpowiedziane" ? "Odpowiedziane" : "Przeczytane";
+          const label =
+            phase === "wymaga odpowiedzi"
+              ? "Wymaga działania"
+              : phase === "nowe"
+                ? "Informacja"
+                : phase === "odpowiedziane"
+                  ? "Odpowiedziane"
+                  : "Przeczytane";
+          const hasDraft = Boolean((drafts[letter.id] ?? "").trim()) && !replies[letter.id];
           return (
-            <button key={letter.id} type="button" className="nx-mail" onClick={() => go("pismo", letter.id)}>
+            <button
+              key={letter.id}
+              type="button"
+              className="nx-mail"
+              onClick={() => go("pismo", letter.id)}
+            >
               <span>
                 <strong>{letter.from}</strong>
-                <small>{letter.subject}</small>
+                <small>
+                  {letter.subject}
+                  {hasDraft ? " · zapisany szkic" : ""}
+                </small>
               </span>
               <span className="nx-pill" data-kind={kind}>
                 {label}
@@ -62,20 +100,30 @@ export function LetterList() {
           );
         })}
       </div>
+      <p className="nx-fine nx-section">
+        Oficjalny serwis:{" "}
+        <a
+          href="https://www.gov.pl/web/e-doreczenia"
+          target="_blank"
+          rel="noreferrer"
+          className="nx-extlink"
+        >
+          gov.pl/web/e-doreczenia (otwiera stronę poza prototypem)
+        </a>
+      </p>
     </div>
   );
 }
 
 export function LetterDetail({ id }: { id: string }) {
   const letter = LETTERS.find((item) => item.id === id);
-  const back = useNexus((s) => s.back);
-  const markRead = useNexus((s) => s.markRead);
-  const draft = useNexus((s) => s.drafts[id] ?? "");
-  const reply = useNexus((s) => s.replies[id]);
-  const setDraft = useNexus((s) => s.setDraft);
-  const sendReply = useNexus((s) => s.sendReply);
-  const showToast = useNexus((s) => s.showToast);
+  const state = useNexus();
+  const { back, go, markRead, setDraft, sendReply, showToast } = state;
+  const draft = state.drafts[id] ?? "";
+  const reply = state.replies[id];
+  const receipt = selectLetterReceipt(state, id);
   const [ask, setAsk] = useState(false);
+  const [plainOpen, setPlainOpen] = useState(true);
 
   useEffect(() => {
     if (letter) markRead(letter.id);
@@ -83,20 +131,97 @@ export function LetterDetail({ id }: { id: string }) {
 
   if (!letter) return <Missing title="Nie ma takiego pisma" onBack={back} />;
 
+  const relatedLinks = selectRelatedLinksForLetter(letter);
+
   return (
     <article className="nx-stage">
-      <PageHead kicker={letter.office} title={letter.subject} lede={`${letter.from} · ${plDate(letter.date)}`} />
+      <PageHead
+        kicker={`${letter.office} · ${letter.reference}`}
+        title={letter.subject}
+        lede={`${letter.from} · ${plDate(letter.date)}`}
+      />
+
+      <section className="nx-benefit" aria-label="Wyjaśnienie pisma po ludzku">
+        <div className="nx-sectionhead">
+          <p className="nx-kicker">Wyjaśnij mi to prościej · interpretacja prototypu</p>
+          <button
+            type="button"
+            className="nx-textbtn"
+            aria-expanded={plainOpen}
+            onClick={() => setPlainOpen((v) => !v)}
+          >
+            {plainOpen ? "Ukryj" : "Rozwiń"}
+          </button>
+        </div>
+        <p>
+          <strong>{letter.plain.whatItMeans}</strong>
+        </p>
+        {plainOpen ? (
+          <div className="nx-stack">
+            <div>
+              <p className="nx-kicker">Fakty z treści pisma</p>
+              <ul className="nx-bullets">
+                {letter.plain.facts.map((fact) => (
+                  <li key={fact}>{fact}</li>
+                ))}
+              </ul>
+            </div>
+            <blockquote className="nx-quote">{letter.plain.sourceExcerpt}</blockquote>
+            <div>
+              <p className="nx-kicker">Wymagania i załączniki</p>
+              <ul className="nx-bullets">
+                {letter.plain.requiredItems.map((req) => (
+                  <li key={req}>{req}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="nx-kicker">Czego prototyp nie rozstrzyga</p>
+              <ul className="nx-bullets">
+                {letter.plain.ambiguities.map((amb) => (
+                  <li key={amb}>{amb}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        ) : null}
+      </section>
+
       <div className="nx-sheet nx-prose">
-        <Watermark motif={letter.motif} />
+        <Watermark motif="manuscript" />
+        <p className="nx-kicker">Treść pisma ze wzoru</p>
         {letter.body.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
       </div>
+
       {reply ? (
         <section className="nx-note">
-          <p className="nx-kicker">Twoja odpowiedź</p>
+          <p className="nx-kicker">Twoja odpowiedź · zapisana w prototypie</p>
           <p>{reply}</p>
-          <p className="nx-fine">Zapisana w prototypie. Nie została wysłana do urzędu.</p>
+          {receipt ? (
+            <div className="nx-receipt">
+              <p className="nx-kicker">Potwierdzenie lokalne · {receipt.code}</p>
+              <p>{receipt.summary}</p>
+              <p className="nx-fine">
+                Zapisano: {formatEventTime(receipt.createdAt)}. {receipt.note}
+              </p>
+            </div>
+          ) : null}
+          <div className="nx-actions">
+            {letter.relatedCaseId ? (
+              <button
+                type="button"
+                className="nx-btn nx-btn-primary"
+                onClick={() => go("sprawa", letter.relatedCaseId)}
+              >
+                <Glyph name="case" /> Otwórz powiązaną sprawę
+              </button>
+            ) : null}
+            <button type="button" className="nx-btn" onClick={() => go("os")}>
+              <Glyph name="timeline" /> Zobacz na osi czasu
+            </button>
+          </div>
         </section>
       ) : (
         <form
@@ -110,30 +235,64 @@ export function LetterDetail({ id }: { id: string }) {
             setAsk(true);
           }}
         >
-          <label className="nx-field">
-            <span>Twoja odpowiedź</span>
+          <div className="nx-sectionhead">
+            <label htmlFor="nx-letter-draft" className="nx-kicker">
+              Twoja odpowiedź (szkic lokalny)
+            </label>
+            {letter.plain.suggestedDraft && !draft.trim() ? (
+              <button
+                type="button"
+                className="nx-textbtn"
+                onClick={() => setDraft(letter.id, letter.plain.suggestedDraft ?? "")}
+              >
+                Wstaw propozycję szkicu
+              </button>
+            ) : null}
+          </div>
+          <div className="nx-field">
             <textarea
+              id="nx-letter-draft"
               value={draft}
               onChange={(event) => setDraft(letter.id, event.target.value)}
               rows={5}
               placeholder="Napisz krótko, po co odpowiadasz"
             />
-          </label>
-          <p className="nx-fine">Szkic zostaje na tym urządzeniu, także gdy wyjdziesz z pisma.</p>
+          </div>
+          <p className="nx-fine">
+            Szkic zostaje na tym urządzeniu, także gdy wyjdziesz z pisma. Zatwierdzenie zaktualizuje Moje pisma, powiązaną sprawę, priorytet na ekranie Start i Moją oś czasu.
+          </p>
           <button type="submit" className="nx-btn nx-btn-primary">
-            Wyślij odpowiedź
+            Sprawdź i zapisz odpowiedź
           </button>
         </form>
       )}
+
+      {relatedLinks.length > 0 ? (
+        <section>
+          <p className="nx-kicker nx-section">Powiązane sprawy i usługi</p>
+          <div className="nx-list">
+            {relatedLinks.map((link) => (
+              <Row
+                key={link.id}
+                glyph={link.glyph}
+                title={link.label}
+                meta={link.meta}
+                onClick={() => link.view && go(link.view, link.selectedId)}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <ConfirmDialog
         open={ask}
         onOpenChange={setAsk}
         title="Zapisać odpowiedź w prototypie?"
-        body="Nie wyślemy jej do urzędu. Zostanie przy tym piśmie, żebyś widział, że sprawa ma twój głos."
+        body={`Treść do zapisu: „${draft.trim().slice(0, 180)}${draft.trim().length > 180 ? "…" : ""}”. Nie wyślemy jej do prawdziwego urzędu — utworzymy potwierdzenie UPO-WZÓR i zaktualizujemy sprawę oraz oś czasu.`}
         confirm="Zapisz odpowiedź"
         onConfirm={() => {
           sendReply(letter.id);
-          showToast("Odpowiedź zapisana w prototypie");
+          showToast("Odpowiedź zapisana — zaktualizowano sprawę i oś czasu");
         }}
       />
     </article>

@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import { civicDay } from "@/lib/nexus/format";
 import { useNexus, useNexusHydrated } from "@/lib/nexus/store";
 import { DocumentDetail, DocumentList } from "./documents";
+import { DemoDock } from "./demo-dock";
 import { DriverHub, HealthHub, Profile, ServiceCatalog } from "./hubs";
+import type { DemoStoryId } from "@/lib/nexus/types";
 import { Home } from "./home";
 import { LetterDetail, LetterList } from "./letters";
 import { Mark } from "./heritage";
@@ -19,9 +21,30 @@ import {
   Timeline,
   TrustedPerson,
 } from "./services";
-import { MoreSheet, Orbit, SideNav, TabBar, Toast, TopBar, useGlobalKeys } from "./shell";
+import { MoreSheet, Orbit, SideNav, TabBar, Toast, TopBar } from "./shell";
 
 const scrolls = new Map<string, number>();
+
+function useGlobalKeys() {
+  const setOrbit = useNexus((s) => s.setOrbit);
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      const target = event.target;
+      const typing =
+        target instanceof HTMLElement &&
+        (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable);
+      if ((event.key === "k" || event.key === "K") && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        setOrbit(true);
+      } else if (event.key === "/" && !typing) {
+        event.preventDefault();
+        setOrbit(true);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [setOrbit]);
+}
 
 function ThemeSync() {
   const theme = useNexus((s) => s.theme);
@@ -45,8 +68,8 @@ function Screen() {
   const view = useNexus((s) => s.view);
   const id = useNexus((s) => s.selectedId);
   if (view === "uslugi") return <ServiceCatalog />;
-  if (view === "zdrowie") return <HealthHub />;
-  if (view === "kierowca") return <DriverHub />;
+  if (view === "zdrowie") return <HealthHub section={id} />;
+  if (view === "kierowca") return <DriverHub section={id} />;
   if (view === "profil") return <Profile />;
   if (view === "start") return <Home />;
   if (view === "dokumenty") return <DocumentList />;
@@ -81,31 +104,60 @@ function Boot() {
     <div className="nx-boot">
       <Mark />
       <p className="nx-brand">
-        <small>mObywatel</small>
-        <strong>NEXUS</strong>
+        <strong>mObywatel</strong>
+        <small>NEXUS</small>
       </p>
-      <p className="nx-fine">Prototyp konkursowy</p>
+      <p className="nx-fine">Niezależny prototyp konkursowy</p>
     </div>
   );
 }
 
 function Live() {
   const onboarded = useNexus((s) => s.onboarded);
+  const finishOnboarding = useNexus((s) => s.finishOnboarding);
+  const startDemoStory = useNexus((s) => s.startDemoStory);
+  const demoStoryId = useNexus((s) => s.demoStoryId);
   const view = useNexus((s) => s.view);
   const id = useNexus((s) => s.selectedId);
   const key = `${view}:${id ?? ""}`;
   const ref = useRef<HTMLDivElement>(null);
   const first = useRef(true);
+  const demoBooted = useRef(false);
   useGlobalKeys();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const demoParam = params.get("demo");
+    if (
+      !demoBooted.current &&
+      (demoParam === "student" || demoParam === "senior" || demoParam === "letter" || demoParam === "wallet")
+    ) {
+      demoBooted.current = true;
+      startDemoStory(demoParam as DemoStoryId);
+      return;
+    }
+    if (!onboarded && params.get("autostart") === "1") {
+      finishOnboarding("daily", "porcelain");
+    }
+  }, [onboarded, finishOnboarding, startDemoStory]);
 
   useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
-    el.scrollTop = scrolls.get(key) ?? 0;
+    if (view === "sprawa" && id?.startsWith("plan-")) {
+      el.scrollTop = 0;
+    } else {
+      el.scrollTop = scrolls.get(key) ?? 0;
+    }
     return () => {
       scrolls.set(key, el.scrollTop);
     };
-  }, [key]);
+  }, [key, view, id]);
+
+  useLayoutEffect(() => {
+    if (ref.current) ref.current.scrollTop = 0;
+  }, [demoStoryId]);
 
   useEffect(() => {
     if (first.current) {
@@ -132,6 +184,7 @@ function Live() {
           <Toast />
         </div>
         <main className="nx-main" id="tresc" ref={ref} tabIndex={-1}>
+          {onboarded && demoStoryId ? <DemoDock /> : null}
           <div key={key} className="nx-view">
             {onboarded ? <Screen /> : <Onboarding />}
           </div>

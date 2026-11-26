@@ -2,39 +2,49 @@
 
 Niezależny prototyp konkursowy. Nie jest aplikacją administracji publicznej.
 
-Nowoczesność na pierwszym planie. Historia w tle. Inteligencja pod spodem.
+Współczesna polska aplikacja obywatelska na pierwszym planie. Inteligentna orkiestracja spraw OneFlow pod spodem. Polskie dziedzictwo graficzne wyłącznie kontekstowo w tle.
 
-## Charakter
+## Hierarchia marki
 
-Szwajcarski rytm, krój IBM Plex, prawie płaskie powierzchnie, linia zamiast cienia. Czerwień jest sygnałem, nie tłem. Guilloche i ryciny mają krycie około 5% i znikają w motywie Kontrast.
+- **Marka główna:** `mObywatel` (IBM Plex Sans 700, granat obywatelski `#14243B`)
+- **Koncepcja drugorzędna:** dyskretny dopisek `NEXUS`
+- **Silnik orkiestracji:** `OneFlow`
+- **Asystent obywatelski:** `W czym mogę pomóc?` (zintegrowane narzędzie publiczne, bez symboliki astronomicznej)
 
-Nie wolno: bibliotek ikon (Lucide, Heroicons, Material), gradientów „AI”, szkła, emoji jako ikon, dużych zaokrągleń, orła, pieczęci państwowej, prawdziwych zabezpieczeń banknotów.
+## Polska tożsamość wizualna
+
+Biel i polska czerwień (`#DC143C`) jako oszczędny akcent tożsamościowy (3 px linia nagłówka i karty `mDowód`, aktywna krawędź nawigacji, znak biało-czerwony `Mark`), głęboki granat obywatelski (`#14243B`), czytelny niebieski funkcjonalny (`#1558C0`), neutralna powierzchnia porcelanowa (`#F3F5F8`) oraz współczesna europejska typografia publiczna.
+
+Nie wolno: bibliotek ikon (Lucide, Heroicons, Material), gradientów „AI”, szkła, emoji jako ikon, dominującej symboliki orbitalnej/astronomicznej, szampańskiego złota, godła, orła, pieczęci państwowych, prawdziwych zabezpieczeń banknotów.
 
 ## Motywy
 
 Tokeny: [DESIGN_TOKENS.json](DESIGN_TOKENS.json) i `src/styles.css`.
 
-- Porcelana — ciepłe tło `#f3efe6`, granat `#172033`, akcja `#1c4b82`.
-- Północ — tło `#0c1422`, kość `#f3ede2`, akcja `#8ec8f5`, ryt złoty `#c6b48a`.
-- Kontrast — czerń, biel, fokus `#ffbf00`, bez znaków wodnych, obrys 2 px.
+- **Porcelana** (`porcelain`) — neutralne tło `#F3F5F8`, powierzchnia `#FFFFFF`, granat `#14243B`, akcja `#1558C0` (hover `#104599`), polska czerwień `#DC143C`.
+- **Północ** (`midnight`) — głęboki granat `#0B1220`, powierzchnia `#131D30`, tekst `#F4F7FB`, akcja `#6EA8FE`, czerwień `#F06478`. Bez szampańskiego złota.
+- **Kontrast** (`contrast`) — czerń `#000000`, biel `#FFFFFF`, fokus `#FFBF00`, promienie `0px`, obrys `2px`, brak znaków wodnych.
 
 Przełącznik motywu ustawia `data-theme` na `html`.
 
 ## Typografia
 
-- Tekst: IBM Plex Sans, łaciński i łaciński rozszerzony.
-- Tytuły i nazwa NEXUS: IBM Plex Serif.
-- Skala tekstu 100–200% przez `--nx-scale` na `html`.
-- Liczby tabelaryczne.
+- **IBM Plex Sans** (łaciński i łaciński rozszerzony): nagłówki (`h1–h3`, waga 700, `text-wrap: balance`), marka główna `mObywatel`, interfejs i treść.
+- **IBM Plex Serif**: stosowany oszczędnie (m.in. cytaty z pism urzędowych).
+- Skala tekstu 100–200% przez `--nx-scale` na `html`. Liczby tabelaryczne (`tabular-nums`).
 
-## Układ
+## Dziedzictwo kontekstowe
 
-Mobile najpierw. Od 64 rem pojawia się boczna nawigacja, dolny pasek znika. Treść ma miarę do 48 rem. Promień 2 px. Karta dokumentu ma ścięty róg, reszta jest prostokątna.
+Znaki wodne (`.nx-mark`, krycie ~3.5%, znikają w `contrast`) pojawiają się wyłącznie tam, gdzie są tematycznie uzasadnione:
+- edukacja (`start-krakow`): motyw geometryczny Kopernika (`orbits`),
+- zdrowie (`mojeIKP`): motyw laboratoryjny Skłodowskiej-Curie (`lab`),
+- sprawy i ścieżki lokalne: motyw architektoniczny (`civic`),
+- treść pism urzędowych: ślad rękopisu (`manuscript`).
 
-## Dni
+Ekrany Start, Dokumenty, Moja oś czasu, Ochrona tożsamości, Dostęp do moich danych i Możliwe wsparcie pozostają czyste i nowoczesne.
 
-11 listopada i 15 sierpnia: linia pod nagłówkiem. 3 maja: mocniejszy rękopis, nadal poniżej 12% krycia. Poza tymi dniami nic się nie zmienia. Podgląd jest w Wyglądzie.
+## Układ i język
 
-## Język
+Mobile najpierw. Od `64rem` pojawia się boczna nawigacja, dolny pasek znika. Treść ma miarę do `48rem`. Kontrolowane zaokrąglenia kart (`12–16px`), ścięty róg wyłącznie na karcie dokumentu.
 
-Interfejs po polsku, bez nazw modułów po angielsku. „Start”, „Moje pisma”, „Możliwe wsparcie”, „Załatw sprawę”, „W czym mogę pomóc?”.
+Interfejs wyłącznie w naturalnej polszczyźnie: **Start**, **Dokumenty**, **Pomoc** / **W czym mogę pomóc?**, **Usługi**, **Profil**, **Moje pisma** (`e-Doręczenia`), **Moje sprawy**, **Ważne zmiany w życiu**, **Możliwe wsparcie**, **Moja oś czasu**, **Dostęp do moich danych**, **Ochrona tożsamości**, **Osoba zaufana**.

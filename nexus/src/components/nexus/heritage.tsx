@@ -39,28 +39,22 @@ const CIVIC =
 export function Mark({ className }: { className?: string }) {
   return (
     <svg className={className ?? "nx-logo"} viewBox="0 0 32 32" aria-hidden="true" focusable="false">
-      <circle cx="16" cy="16" r="1.7" fill="currentColor" />
-      <ellipse
-        cx="16"
-        cy="16"
-        rx="11.5"
-        ry="4.6"
+      <rect x="3" y="3" width="26" height="13" rx="3" className="nx-mark-white" />
+      <rect x="3" y="16" width="26" height="13" rx="3" className="nx-mark-crimson" />
+      <rect x="3" y="13" width="26" height="6" className="nx-mark-white" />
+      <rect x="3" y="16" width="26" height="4" className="nx-mark-crimson" />
+      <rect
+        x="3"
+        y="3"
+        width="26"
+        height="26"
+        rx="5"
         fill="none"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        transform="rotate(-28 16 16)"
+        className="nx-mark-frame"
+        strokeWidth="1.6"
       />
-      <ellipse
-        cx="16"
-        cy="16"
-        rx="11.5"
-        ry="4.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.15"
-        transform="rotate(56 16 16)"
-      />
-      <path d="M23.5 4.5h4.5V9" fill="none" stroke="currentColor" strokeWidth="1.15" />
+      <path d="M9.5 11.5h13" className="nx-mark-navy" strokeWidth="2.2" strokeLinecap="square" />
+      <path d="M9.5 20.5h8.5" className="nx-mark-on-crimson" strokeWidth="2.2" strokeLinecap="square" />
     </svg>
   );
 }
