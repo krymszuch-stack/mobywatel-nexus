@@ -11,7 +11,7 @@ const MODES: { id: HomeMode; title: string; text: string }[] = [
   {
     id: "daily",
     title: "Na co dzień",
-    text: "Dokumenty, terminy i jedno pismo, które naprawdę czeka.",
+    text: "Dokumenty, terminy i najpilniejsze zadanie.",
   },
   {
     id: "dense",
@@ -42,7 +42,7 @@ export function Onboarding() {
       <p className="nx-kicker">Pierwsze uruchomienie</p>
       <h1>Jak ma wyglądać twój start?</h1>
       <p className="nx-lede">
-        Ten sam urząd, trzy gęstości. Motyw i wielkość tekstu zmienisz później w wyglądzie.
+Wybierz układ. Motyw i wielkość tekstu możesz zmienić później.
       </p>
       <div className="nx-choices" role="group" aria-label="Układ ekranu startowego">
         {MODES.map((item) => (
@@ -105,8 +105,7 @@ export function Onboarding() {
           Tak chcę zacząć
         </button>
         <p className="nx-fine">
-          Niezależny prototyp konkursowy. To nie jest oficjalna aplikacja administracji publicznej. Dane Zofii Baran
-          są fikcyjne.
+          Niezależny prototyp z fikcyjnymi danymi.
         </p>
       </div>
     </div>

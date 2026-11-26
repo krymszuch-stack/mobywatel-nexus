@@ -34,11 +34,7 @@ export function LetterList() {
   });
   return (
     <div className="nx-stage">
-      <PageHead
-        kicker="e-Doręczenia"
-        title="Pisma z urzędów"
-        lede="Podgląd skrzynki z wyjaśnieniem po ludzku, szkicami i lokalnym potwierdzeniem. Nic nie wychodzi do urzędu."
-      />
+      <PageHead title="Pisma z urzędów" />
       <Field label="Źródło pisma">{(field) => <select {...field} value={source} onChange={(e) => selectSource(e.target.value === "all" ? undefined : e.target.value)}>
         <option value="all">Wszystkie</option><option value="nexus">e-Doręczenia</option>
         {all.map((data) => <option key={data.source} value={data.source}>{agencyNames[data.source]}</option>)}
@@ -118,14 +114,13 @@ export function LetterList() {
         })}
       </div>
       <p className="nx-fine nx-section">
-        Oficjalny serwis:{" "}
         <a
           href="https://www.gov.pl/web/e-doreczenia"
           target="_blank"
           rel="noreferrer"
           className="nx-extlink"
         >
-          gov.pl/web/e-doreczenia (otwiera stronę poza prototypem)
+          Otwórz e-Doręczenia w gov.pl
         </a>
       </p>
       </>}
@@ -273,7 +268,6 @@ export function LetterDetail({ id }: { id: string }) {
               value={draft}
               onChange={(event) => setDraft(letter.id, event.target.value)}
               rows={5}
-              placeholder="Napisz krótko, po co odpowiadasz"
             />
           </div>
           <p className="nx-fine">

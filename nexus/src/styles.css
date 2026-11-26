@@ -552,7 +552,7 @@
     min-height: 5.4rem;
   }
   .nx-perk-sum { font-size: 1.55rem; letter-spacing: -0.03em; font-weight: 650; }
-  .nx-sheet, .nx-benefit, .nx-note, .nx-codeplate {
+  .nx-sheet, .nx-benefit, .nx-note {
     position: relative;
     background: var(--nx-surface);
     border: 1px solid var(--nx-line);
@@ -1049,8 +1049,6 @@
   }
   .nx-prose p { max-width: 40rem; }
   .nx-form h2 { margin-top: 0.4rem; }
-  .nx-codeplate { display: grid; justify-items: center; gap: 0.4rem; text-align: center; }
-  .nx-codeplate .nx-glyph { width: 4rem; height: 4rem; }
 
   .nx-bullets {
     margin: 0.35rem 0 0.75rem;
@@ -1335,7 +1333,6 @@
     border-left: 2px solid transparent;
   }
   .nx-sidebtn[aria-current="page"] { border-left-color: var(--nx-red); background: var(--nx-soft); }
-  .nx-side-note { margin-top: auto; padding: 1rem 0.45rem 0; }
   .nx-tabbar { display: none; }
   .nx-column { height: 100dvh; }
   .nx-alarms { grid-template-columns: repeat(4, minmax(0, 1fr)); }

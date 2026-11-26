@@ -1,7 +1,7 @@
 import { useId, useRef, useState, type ReactNode, type Ref } from "react";
 import { agencyNames, warsaw, type CivicData, type CivicTask } from "@/lib/nexus/civic/model";
 import { ConfirmDialog, Row, Status } from "../ui";
-import { civicGlyph, openTarget } from "./navigation";
+import { civicGlyph, openTarget, usePresenterTools } from "./navigation";
 
 export function Button({
   children,
@@ -205,6 +205,8 @@ export function Freshness({
 }
 
 export function DemoPanel({ children, reset }: { children: ReactNode; reset: () => void }) {
+  const enabled = usePresenterTools();
+  if (!enabled) return null;
   return (
     <details className="nx-sheet civic-demo">
       <summary>Scenariusze demo</summary>

@@ -103,9 +103,7 @@ export function CivicWizard<D extends CivicData>({
         <h2>Sprawdzamy wynik</h2>
         <p>Nie potwierdzono wysłania. Formularz jest zapisany.</p>
         {resultCheck && (
-          <p role="status">
-            Adapter demo potwierdził, że dokument nie został wysłany. Możesz ponowić próbę.
-          </p>
+          <p role="status">Dokument nadal czeka na wysłanie. Możesz ponowić próbę.</p>
         )}
         <Button
           primary
@@ -139,7 +137,7 @@ export function CivicWizard<D extends CivicData>({
       {spec.code === "KRB" && step === 1 && (
         <p>
           Sprawdź, czy masz dokumenty związane z wykształceniem i zatrudnieniem w fikcyjnym
-          scenariuszu. Metadane załączników dodasz na kolejnym etapie.
+          scenariuszu. Załączniki wybierzesz na kolejnym etapie.
         </p>
       )}
       {spec.code === "KRB" && step === 3 && (

@@ -69,7 +69,6 @@ export function Courts({ section, resource }: { section: string; resource?: stri
   return (
     <div className="nx-stage civic-view">
       <PageHead
-        kicker="Dane demonstracyjne"
         title="Sprawy sądowe"
         lede={
           mode === "simple"
@@ -747,7 +746,7 @@ export function CourtCaseDetail({ id }: { id: string }) {
   return (
     <div className="nx-stage civic-view">
       <PageHead
-        kicker="Sądy · Dane demonstracyjne"
+        kicker="Sądy"
         title={item.title}
         lede={`${item.number} · ${item.office} · ${item.division}`}
       />

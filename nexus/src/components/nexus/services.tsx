@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { agencyNames, visible, warsaw } from "@/lib/nexus/civic/model";
-import { caseVisible, useAgencySchedule, useCivicData, visibleEvents } from "@/lib/nexus/civic/select";
+import { caseVisible, resetCivicData, useAgencySchedule, useCivicData, visibleEvents } from "@/lib/nexus/civic/select";
 import { civicGlyph } from "./civic/navigation";
 import { Field, TaskRows } from "./civic/ui";
 import {
@@ -568,7 +568,6 @@ export function Benefits() {
             value={mealAsk}
             disabled={mealSent}
             onChange={(event) => setMealAsk(event.target.value)}
-            placeholder="Na przykład: proszę o informację, jakie dochody bierzecie pod uwagę"
           />
         </label>
         {mealSent ? (
@@ -657,6 +656,7 @@ export function Timeline() {
                       <button
                         type="button"
                         className="nx-btn nx-btn-primary"
+                        disabled={!editDate || !editTime}
                         onClick={() => {
                           state.updateReminder(rem.id, { isoDate: editDate, time: editTime });
                           setEditingId(null);
@@ -1148,22 +1148,22 @@ export function Settings() {
         ))}
       </fieldset>
       <p className="nx-fine">
-        Wyszukiwarka i asystent „W czym mogę pomóc?”: Ctrl+K albo klawisz /. Niezależny prototyp konkursowy — nie
-        jest aplikacją administracji publicznej.
+        Otwórz wyszukiwarkę skrótem Ctrl+K, ⌘K lub klawiszem /.
       </p>
       <button type="button" className="nx-btn nx-btn-danger" onClick={() => setAsk(true)}>
-        Przywróć prototyp
+        Przywróć stan początkowy
       </button>
       <ConfirmDialog
         open={ask}
         onOpenChange={setAsk}
         title="Wyczyścić zapisany stan?"
-        body="Znikną szkice, odpowiedzi, zapisane plany, przypomnienia, udostępnienia i wybór układu. Dane wzoru zostaną."
+        body="Ustawienia, szkice, odpowiedzi i zmiany we wszystkich usługach wrócą do stanu początkowego."
         confirm="Przywróć"
         danger
         onConfirm={() => {
+          resetCivicData();
           resetAll();
-          showToast("Prototyp przywrócony");
+          showToast("Przywrócono stan początkowy");
         }}
       />
     </div>

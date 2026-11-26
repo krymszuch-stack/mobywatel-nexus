@@ -61,7 +61,9 @@ export function ZusHealthSource({ compact = false }: { compact?: boolean }) {
       <p>
         ZUS udostępnia informację o zgłoszeniu. Prawo do świadczeń wymaga odrębnego potwierdzenia.
       </p>
-      <Button onClick={() => (compact ? go("urzad", "zus/insurance") : go("zdrowie"))}>
+      <Button
+        onClick={() => (compact ? go("urzad", "zus/insurance") : go("zdrowie", "ubezpieczenie"))}
+      >
         {compact ? "Zobacz ubezpieczenia w ZUS" : "Przejdź do Zdrowie (mojeIKP)"}
       </Button>
     </section>
@@ -91,7 +93,7 @@ export function Zus({ section, resource }: { section: string; resource?: string 
   }
   return (
     <div className="nx-stage civic-view">
-      <PageHead kicker="Dane demonstracyjne" title="ZUS — ubezpieczenia i świadczenia" />
+      <PageHead title="ZUS — ubezpieczenia i świadczenia" />
       <Filters
         label="Sekcje ZUS"
         value={section}

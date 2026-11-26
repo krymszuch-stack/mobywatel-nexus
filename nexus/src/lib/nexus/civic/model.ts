@@ -15,6 +15,30 @@ export function demoDate(days: number, time = "10:00") {
   return `${date}T${time}:00+01:00`;
 }
 
+const warsawClock = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Europe/Warsaw",
+  timeZoneName: "longOffset",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+export function warsawDateTime(date: string, time: string): string | null {
+  const local = `${date}T${time}:00`;
+  const noon = Date.parse(`${date}T12:00:00Z`);
+  if (!Number.isFinite(noon) || !Number.isFinite(Date.parse(`${local}Z`))) return null;
+  const offset = warsawClock
+    .formatToParts(noon)
+    .find((part) => part.type === "timeZoneName")
+    ?.value.slice(3);
+  if (!offset) return null;
+  const at = `${local}${offset}`;
+  const formatted = warsawClock.format(Date.parse(at));
+  return formatted.startsWith(`${date} ${time}`) ? at : null;
+}
+
 export function warsaw(value: string, time = false) {
   return new Intl.DateTimeFormat("pl-PL", {
     dateStyle: "medium",
@@ -174,7 +198,23 @@ export function repository<D extends CivicData>(source: Agency, initial: () => D
         change: (update) => set(({ data }) => ({ data: update(data) })),
         reset: () => set({ data: initial() }),
       }),
-      { name: `nexus-civic-${source}`, version: 1, partialize: ({ data }) => ({ data }) },
+      {
+        name: `nexus-civic-${source}`,
+        version: 2,
+        partialize: ({ data }) => ({ data }),
+        migrate: (persisted, version) => {
+          const data = (persisted as { data?: D } | undefined)?.data;
+          if (version !== 1 || !data || !Array.isArray(data.appointments))
+            return { data: initial() };
+          const appointments = data.appointments.map((item) => {
+            // Version 1 stored the selected Warsaw wall time with a fixed winter offset.
+            if (!item.at.endsWith("+01:00")) return item;
+            const at = warsawDateTime(item.at.slice(0, 10), item.at.slice(11, 16));
+            return at && at !== item.at ? { ...item, at } : item;
+          });
+          return { data: { ...data, appointments } };
+        },
+      },
     ),
   );
 }

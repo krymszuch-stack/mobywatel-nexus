@@ -38,6 +38,13 @@ export function visibleNotices(data: CivicData): { notice: CivicNotice; event: C
     .sort((a, b) => Date.parse(b.event.at) - Date.parse(a.event.at));
 }
 
+export function resetCivicData() {
+  useSow.getState().reset();
+  useZus.getState().reset();
+  useWork.getState().reset();
+  useCourt.getState().reset();
+}
+
 export function useCivicData(): CivicData[] {
   return [
     useSow((state) => state.data),

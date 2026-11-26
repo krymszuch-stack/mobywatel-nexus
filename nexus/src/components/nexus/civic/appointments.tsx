@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNexus } from "@/lib/nexus/store";
 import {
-  demoDate,
   demoId,
   demoNow,
   eventFor,
@@ -9,6 +8,7 @@ import {
   publish,
   visible,
   warsaw,
+  warsawDateTime,
   type CivicAppointment,
   type CivicData,
 } from "@/lib/nexus/civic/model";
@@ -226,13 +226,9 @@ export function Appointments<D extends CivicData>({
                 title="Potwierdzić termin demonstracyjny?"
                 body="Termin zostanie zapisany tylko w NEXUS."
                 onConfirm={() => {
-                  const at = demoDate(
-                    Math.round(
-                      (Date.parse(fields.date) - Date.parse(demoNow.slice(0, 10))) / 86_400_000,
-                    ),
-                    selected,
-                  );
+                  const at = warsawDateTime(fields.date, selected);
                   if (
+                    !at ||
                     expiredSlot ||
                     data.health !== "ready" ||
                     Date.parse(at) <= Date.parse(demoNow)
@@ -241,7 +237,11 @@ export function Appointments<D extends CivicData>({
                     setErrors({ slot: "Termin nie jest już dostępny. Wybierz inny termin." });
                     return;
                   }
-                  if (appointments.some((item) => item.state === "booked" && item.at === at)) {
+                  if (
+                    appointments.some(
+                      (item) => item.state === "booked" && Date.parse(item.at) === Date.parse(at),
+                    )
+                  ) {
                     setErrors({ slot: "Masz już wizytę o tej godzinie." });
                     return;
                   }

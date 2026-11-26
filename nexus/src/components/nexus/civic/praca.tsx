@@ -69,7 +69,7 @@ export function Praca({ section, resource }: { section: string; resource?: strin
 
   return (
     <div className="nx-stage civic-view">
-      <PageHead kicker="Koncept • dane demonstracyjne" title="Praca i urząd pracy" lede={office} />
+      <PageHead title="Praca i urząd pracy" lede={office} />
       <Field label="Kontekst urzędu pracy">
         {(field) => (
           <select

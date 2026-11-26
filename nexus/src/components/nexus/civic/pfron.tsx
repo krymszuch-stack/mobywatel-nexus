@@ -94,11 +94,7 @@ export function Pfron({ section, resource }: { section: string; resource?: strin
 
   return (
     <div className="nx-stage civic-view">
-      <PageHead
-        kicker="Tryb demonstracyjny • dane fikcyjne"
-        title="Wsparcie PFRON"
-        lede="Wnioski, dokumenty i informacje o Twoim wsparciu"
-      />
+      <PageHead title="Wsparcie PFRON" lede="Wnioski, dokumenty i informacje o Twoim wsparciu" />
       <Filters
         label="Wsparcie PFRON"
         value={section}

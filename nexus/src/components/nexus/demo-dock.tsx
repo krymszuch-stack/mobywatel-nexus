@@ -132,7 +132,7 @@ export function DemoDock() {
         })}
       </div>
 
-      <p className="nx-fine">{story.summary} Postęp oznacza się wyłącznie po realnych zmianach stanu aplikacji.</p>
+      <p className="nx-fine">{story.summary}</p>
 
       <ol className="nx-demo-steps">
         {story.steps.map((step, index) => {
@@ -172,14 +172,7 @@ export function DemoLauncher() {
 
   return (
     <section className="nx-sheet nx-section" aria-label="Opcjonalny tryb prezentacji 90 sekund">
-      <div className="nx-sectionhead">
-        <p className="nx-kicker">Opcjonalny przewodnik · 90 sekund</p>
-        <Status tone="info">4 historie</Status>
-      </div>
-      <h2>Poznaj 4 historie obywatelskie (OneFlow)</h2>
-      <p className="nx-fine">
-        Fikcyjne persony (Student, Seniorka, Obywatel z pismem, Utrata portfela) i realne przejścia stanu bez udawanego postępu. Możesz wyłączyć lub zresetować w każdej chwili.
-      </p>
+      <h2>Przewodnik po OneFlow</h2>
       <div className="nx-chips">
         {DEMO_STORIES.map((story) => (
           <button

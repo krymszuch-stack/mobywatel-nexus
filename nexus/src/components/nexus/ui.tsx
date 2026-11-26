@@ -1,5 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import type { ReactNode } from "react";
+import { useRef, type ReactNode } from "react";
 import { Glyph, type GlyphName } from "./glyph";
 
 export function PageHead({
@@ -103,7 +103,7 @@ export function Status({
 export function Missing({ title, onBack }: { title: string; onBack: () => void }) {
   return (
     <div>
-      <PageHead kicker="Prototyp" title={title} lede="Tego widoku nie ma w danych wzoru." />
+      <PageHead title={title} />
       <button type="button" className="nx-btn" onClick={onBack}>
         Wróć
       </button>
@@ -130,18 +130,30 @@ export function ConfirmDialog({
   danger?: boolean;
   restoreFocus?: () => void;
 }) {
+  const previousFocus = useRef<HTMLElement | null>(null);
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
         <Dialog.Overlay className="nx-overlay" />
-        <Dialog.Content className="nx-dialog" aria-describedby="nx-dialog-body" onCloseAutoFocus={(event) => {
-          if (!restoreFocus) return;
-          event.preventDefault();
-          restoreFocus();
-        }}>
+        <Dialog.Content
+          className="nx-dialog"
+          onOpenAutoFocus={() => {
+            previousFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+          }}
+          onCloseAutoFocus={(event) => {
+            if (restoreFocus) {
+              event.preventDefault();
+              restoreFocus();
+            } else if (previousFocus.current?.isConnected) {
+              event.preventDefault();
+              previousFocus.current.focus({ preventScroll: true });
+            }
+          }}
+        >
           <span className="nx-grab" aria-hidden="true" />
           <Dialog.Title className="nx-dialog-title">{title}</Dialog.Title>
-          <Dialog.Description id="nx-dialog-body" className="nx-lede">
+          <Dialog.Description className="nx-lede">
             {body}
           </Dialog.Description>
           <div className="nx-dialog-actions">

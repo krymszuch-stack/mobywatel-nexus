@@ -23,7 +23,7 @@ import { Zus, ZusCaseActions, ZusDocumentActions } from "./zus";
 import { useNexus } from "@/lib/nexus/store";
 import { PageHead, Row, Status } from "../ui";
 import { Pfron, SowDetails, SowDocumentActions } from "./pfron";
-import { civicGlyph, openTarget } from "./navigation";
+import { civicGlyph, openTarget, usePresenterTools } from "./navigation";
 import { Button, Filters, TaskRows } from "./ui";
 
 export function AgencyScreen({ id }: { id: string }) {
@@ -63,11 +63,7 @@ export function CivicCaseDetail({ id }: { id: string }) {
   );
   return (
     <div className="nx-stage civic-view">
-      <PageHead
-        kicker={`${agencyNames[item.source]} · Dane demonstracyjne`}
-        title={item.title}
-        lede={item.summary}
-      />
+      <PageHead kicker={agencyNames[item.source]} title={item.title} lede={item.summary} />
       <p>{[item.number, item.office, warsaw(item.updatedAt)].filter(Boolean).join(" · ")}</p>
       {!sowItem && tasks.length > 0 && (
         <section className="civic-stack">
@@ -140,11 +136,7 @@ export function CivicDocumentDetail({ id }: { id: string }) {
   if (!item) return <Unavailable title="Brak dostępu do dokumentu" />;
   return (
     <div className="nx-stage civic-view">
-      <PageHead
-        kicker={`${agencyNames[item.source]} · Dokument demonstracyjny`}
-        title={item.title}
-        lede={item.office}
-      />
+      <PageHead kicker={agencyNames[item.source]} title={item.title} lede={item.office} />
       <section className="nx-sheet civic-stack">
         <p>
           {item.kind} · Wersja {item.version} · Opublikowano {warsaw(item.publishedAt)}
@@ -219,6 +211,7 @@ export function CivicDocumentDetail({ id }: { id: string }) {
 
 export function CivicNotifications({ initial }: { initial?: string }) {
   const all = useCivicData();
+  const presenterTools = usePresenterTools();
   const go = useNexus((s) => s.go);
   const source = initial ?? "all";
   const select = useNexus((s) => s.select);
@@ -228,7 +221,7 @@ export function CivicNotifications({ initial }: { initial?: string }) {
     .sort((a, b) => Date.parse(b.event.at) - Date.parse(a.event.at));
   return (
     <div className="nx-stage civic-view">
-      <PageHead title="Powiadomienia" lede="Informacje i zadania z usług demonstracyjnych NEXUS." />
+      <PageHead title="Powiadomienia" />
       <Filters
         label="Źródło powiadomień"
         value={source}
@@ -265,11 +258,13 @@ export function CivicNotifications({ initial }: { initial?: string }) {
         ))}
       </div>
       {!rows.length && <p role="status">Brak powiadomień w tym zakresie.</p>}
-      <details className="nx-sheet civic-demo">
-        <summary>Podgląd powiadomienia push</summary>
-        <p>Nowa informacja w aplikacji NEXUS</p>
-        <p>Otwórz aplikację, aby zobaczyć szczegóły.</p>
-      </details>
+      {presenterTools ? (
+        <details className="nx-sheet civic-demo">
+          <summary>Podgląd powiadomienia push</summary>
+          <p>Nowa informacja w aplikacji NEXUS</p>
+          <p>Otwórz aplikację, aby zobaczyć szczegóły.</p>
+        </details>
+      ) : null}
       <Button onClick={() => go("pisma")}>Otwórz pisma z urzędów</Button>
     </div>
   );

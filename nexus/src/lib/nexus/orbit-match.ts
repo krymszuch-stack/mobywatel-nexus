@@ -722,7 +722,7 @@ export function matchOrbit(query: string, unread: number): Dest[] {
     .sort((a, b) => b.score - a.score);
 
   const serviceHits: Dest[] = SERVICES.filter((service) => {
-    const blob = fold(`${service.name} ${service.description} ${service.category} ${service.scopeNote}`);
+    const blob = fold(`${service.name} ${service.institution} ${service.description} ${service.category} ${service.scopeNote}`);
     return blob.includes(q) || (tokens.length > 0 && tokens.some((part) => part.length >= 3 && blob.includes(part)));
   }).map((service) => ({
     id: `svc-${service.id}`,

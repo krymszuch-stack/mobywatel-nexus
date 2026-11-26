@@ -8,6 +8,7 @@ import {
   publish,
   saveDraft,
   visible,
+  warsawDateTime,
   type Draft,
 } from "./civic/model";
 import { seedSow, submitCorrection, updateSowDeadline, validateSowMessage } from "./civic/pfron";
@@ -206,4 +207,10 @@ test("Sądy: duplikat zdarzenia nie tworzy wpisu; dwa dokumenty o tym samym tytu
     data.documents[0].caseId,
   );
   assert.equal(publish(data, event), data);
+});
+
+test("Wizyty: wybrana godzina pozostaje czasem warszawskim przez cały rok", () => {
+  assert.equal(warsawDateTime("2027-06-01", "11:00"), "2027-06-01T11:00:00+02:00");
+  assert.equal(warsawDateTime("2027-01-05", "11:00"), "2027-01-05T11:00:00+01:00");
+  assert.equal(warsawDateTime("2027-03-28", "02:30"), null);
 });

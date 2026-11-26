@@ -2,7 +2,7 @@
 
 Wejście do każdego modułu znajduje się w katalogu **Usługi** i w wyszukiwarce. Wspólne widoki **Moje sprawy**, **Pisma z urzędów**, **Moja oś czasu** i dzwonek korzystają z rekordów tych samych adapterów. OneFlow pokazuje otwarte zadania, a oś czasu zawiera terminy wizyt i aktywne przypomnienia sądowe.
 
-Każdy adapter przechowuje własne dane w przeglądarce. Zegar scenariuszy ma punkt odniesienia 26 listopada 2026 r. o 10:00 w strefie Europe/Warsaw. Reset z panelu **Scenariusze demo** przywraca dane wybranej usługi. Konta, dokumenty, identyfikatory i kwoty w tych modułach są fikcyjne.
+Każdy adapter przechowuje własne dane w przeglądarce. Zegar scenariuszy ma punkt odniesienia 26 listopada 2026 r. o 10:00 w strefie Europe/Warsaw. Dodaj `?narzedzia=1` do adresu aplikacji (lub `&narzedzia=1`, jeśli adres ma już parametr), aby wyświetlić panel **Scenariusze demo** i podgląd powiadomień push. Reset z panelu przywraca dane wybranej usługi. Wszystkie dane lokalne można przywrócić w ustawieniach wyglądu. Konta, dokumenty, identyfikatory i kwoty w tych modułach są fikcyjne.
 
 ## Wsparcie PFRON
 
@@ -63,7 +63,7 @@ Katalog grupuje sześć obszarów z praca.gov.pl. Formy KRB i ich tryby mają os
 | ePraca, szczegóły oferty i ulubione. Wizyty własne, urzędowe i wejście online | Sprawdzono w Chromium |
 | Reset Pracy zachowujący zapisane dane PFRON | Sprawdzono w Chromium |
 | PSZ-KRBU, PSZ-ZPP i PSZ-WWZ, w tym zamknięcie zadania po uzupełnieniu | Sprawdzono w Chromium |
-| Konflikt i wygaśnięcie terminu rezerwacji | Dostępne w demonstracji. Poza opisanym testem przeglądarkowym |
+| Konflikt i wygaśnięcie terminu rezerwacji | Sprawdzono w Chromium. Konflikt pozostawia jedną wizytę, a wygaśnięcie zachowuje dane formularza |
 
 Subskrypcje i podgląd push są lokalne. Umowy elektroniczne i funkcje pełnego e-Urzędu otwierają właściwe serwisy. Przyszły adapter publicznych ofert może korzystać z udokumentowanego WebService ePraca po spełnieniu warunków dla integratorów. Prywatne sprawy, pisma i wizyty wymagają osobnego uzgodnienia dostępu.
 
@@ -84,9 +84,10 @@ Subskrypcje i podgląd push są lokalne. Umowy elektroniczne i funkcje pełnego 
 ## Kontrole techniczne
 
 - `npm run typecheck` i `npm run lint` zakończyły się powodzeniem.
-- `npm test` zaliczyło 21 testów, w tym 10 dla nowych modułów.
+- `npm test` zaliczyło 22 testy, w tym 11 dla nowych modułów.
 - `npm run build` wygenerował pakiet TanStack Start/Nitro. Bundler wyświetlił ostrzeżenia zależności o dyrektywie `use client`.
 - Główne ścieżki wykonano w Chromium przez Playwright. Dodatkowo zweryfikowano listy modułów przy szerokościach 360, 390, 430 i 1440 px w Porcelanie, Północy i Kontraście ze skalą 100%, 125% i 200%. Naprawiono przewijanie w poziomie oraz powrót fokusu po zamknięciu potwierdzenia.
+- Weryfikacja buildu objęła pierwsze renderowanie z wyłączonym JavaScriptem, ponowne wejście, wyszukiwanie bez polskich znaków, migrację zapisanej wizyty na czas letni i globalny reset. W testach prezentacji nie wystąpiły błędy przeglądarki ani odpowiedzi HTTP 4xx/5xx. Axe nie zgłosił naruszeń na sprawdzonych ekranach.
 - Czytnik ekranu oraz klawiatura ekranowa na fizycznym telefonie pozostają poza zakresem wykonanych kontroli.
 
 Połączenia z administracją reprezentują lokalne adaptery i odnośniki do publicznych portali. Podpisy, wpłaty, wysyłki, odbiory i rezerwacje to symulacje. Produkcyjne połączenia zależą od uzgodnionego dostępu, autoryzacji i kontraktu każdej instytucji.
