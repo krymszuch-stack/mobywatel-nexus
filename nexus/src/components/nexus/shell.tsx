@@ -8,6 +8,7 @@ import { Glyph, type GlyphName } from "./glyph";
 import { Mark } from "./heritage";
 import { openLetterCount } from "./letters-state";
 import { Status } from "./ui";
+import { useUnreadCivicNotices } from "@/lib/nexus/civic/select";
 
 const TABS: { id: ViewId | "szukaj"; label: string; glyph: GlyphName }[] = [
   { id: "start", label: "Start", glyph: "start" },
@@ -97,14 +98,14 @@ export function SideNav() {
           );
         })}
       </nav>
-      <p className="nx-fine nx-side-note">
-        Niezależny prototyp konkursowy. Nie jest aplikacją administracji publicznej.
-      </p>
     </aside>
   );
 }
 
 export function TopBar() {
+  const unread = useUnreadCivicNotices();
+  const onboarded = useNexus((s) => s.onboarded);
+  const go = useNexus((s) => s.go);
   const stack = useNexus((s) => s.stack);
   const back = useNexus((s) => s.back);
   const setOrbit = useNexus((s) => s.setOrbit);
@@ -118,11 +119,17 @@ export function TopBar() {
       ) : (
         <Mark />
       )}
-      <p className="nx-brand">
-        <strong>mObywatel</strong>
-        <small>NEXUS</small>
-      </p>
-      <span className="nx-specimen">WZÓR</span>
+      <div className="nx-top-identity">
+        <p className="nx-brand">
+          <strong>mObywatel</strong>
+          <small>NEXUS</small>
+        </p>
+        <span className="nx-specimen" title="Niezależny prototyp z fikcyjnymi danymi">DEMO</span>
+      </div>
+      {onboarded && <button type="button" className="nx-iconbtn civic-bell" onClick={() => go("powiadomienia")} aria-label={`Powiadomienia, nieprzeczytane: ${unread}`}>
+        <Glyph name="bell" />
+        {unread > 0 && <span aria-hidden="true" className="civic-bell-count">{unread}</span>}
+      </button>}
       <button
         type="button"
         className="nx-iconbtn"
@@ -152,6 +159,7 @@ export function TabBar() {
               ? profileViews.has(view)
               : item.id === "uslugi"
                 ? view === "uslugi" ||
+                  view === "urzad" ||
                   view === "zdrowie" ||
                   view === "kierowca" ||
                   view === "zalatw" ||
@@ -218,6 +226,7 @@ export function MoreSheet() {
 export function Orbit() {
   const state = useNexus();
   const inputRef = useRef<HTMLInputElement>(null);
+  const previousFocus = useRef<HTMLElement | null>(null);
   const query = state.orbitDraft;
   const analysis = analyzeOrbitQuery(query, state);
   const plan = analysis.actionPlan;
@@ -229,10 +238,15 @@ export function Orbit() {
         <Dialog.Overlay className="nx-overlay" />
         <Dialog.Content
           className="nx-orbit"
-          aria-describedby="nx-orbit-desc"
           onOpenAutoFocus={(event) => {
+            previousFocus.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
             event.preventDefault();
             inputRef.current?.focus();
+          }}
+          onCloseAutoFocus={(event) => {
+            if (!previousFocus.current?.isConnected) return;
+            event.preventDefault();
+            previousFocus.current.focus({ preventScroll: true });
           }}
         >
           <div className="nx-sectionhead">
@@ -247,8 +261,8 @@ export function Orbit() {
             </button>
           </div>
           <Dialog.Title className="nx-dialog-title">Co chcesz załatwić?</Dialog.Title>
-          <Dialog.Description id="nx-orbit-desc" className="nx-fine">
-            Opisz swoją sytuację po polsku. Działa lokalnie na urządzeniu — łączy usługi, wykrywa brakujące dane i układa wspólny plan działania.
+          <Dialog.Description className="nx-fine">
+            Opisz, co chcesz załatwić. Możesz też wyszukać usługę.
           </Dialog.Description>
 
           <form
@@ -273,7 +287,6 @@ export function Orbit() {
               ref={inputRef}
               value={query}
               onChange={(event) => state.setOrbitDraft(event.target.value)}
-              placeholder="Np. Zaczynam studia, przeprowadzam się do Krakowa i podejmuję pierwszą pracę..."
               autoComplete="off"
             />
           </form>
@@ -332,7 +345,7 @@ export function Orbit() {
                   ))}
                 </ul>
 
-                <p className="nx-kicker">Zdeduplikowane wymagania (podajesz raz)</p>
+                <p className="nx-kicker">Dane wspólne dla kilku spraw</p>
                 <ul className="nx-bullets">
                   {plan.deduplicatedRequirements.map((req) => (
                     <li key={req}>{req}</li>

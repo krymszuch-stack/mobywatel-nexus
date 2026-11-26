@@ -52,6 +52,7 @@ export const GLYPH_NAMES = [
   "plus",
   "clock",
   "school",
+  "court",
 ] as const;
 
 export type GlyphName = (typeof GLYPH_NAMES)[number];
@@ -62,6 +63,8 @@ export type GlyphName = (typeof GLYPH_NAMES)[number];
  * confident rounded strokes (1.9px / 2.2px selected) + soft semantic interior tint (.nx-g-fill).
  */
 export const GLYPH_PATHS: Record<GlyphName, string> = {
+  court: `<path class="nx-g-fill" d="M3 9 12 4l9 5v2H3zM4 18h16v2H4z"/><path d="M3 9 12 4l9 5v2H3zM4 18h16v2H4zM6 11v7m4-7v7m4-7v7m4-7v7"/>`,
+
   // Sturdy house with roof, chimney and front door
   start: `<path class="nx-g-fill" d="M5.5 11.2 12 5.4l6.5 5.8V20h-13z"/><path d="M3.2 11.6 12 4l8.8 7.6"/><path d="M5.6 9.8V19.6a.9.9 0 0 0 .9.9h11a.9.9 0 0 0 .9-.9V9.8"/><path d="M10 20.5v-5.2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5.2"/><path d="M16.5 4.8v2.6"/>`,
 

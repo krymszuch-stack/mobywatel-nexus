@@ -122,6 +122,7 @@
   .nx-column {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr);
     height: 100dvh;
     min-width: 0;
     max-width: 100%;
@@ -551,7 +552,7 @@
     min-height: 5.4rem;
   }
   .nx-perk-sum { font-size: 1.55rem; letter-spacing: -0.03em; font-weight: 650; }
-  .nx-sheet, .nx-benefit, .nx-note, .nx-codeplate {
+  .nx-sheet, .nx-benefit, .nx-note {
     position: relative;
     background: var(--nx-surface);
     border: 1px solid var(--nx-line);
@@ -1048,8 +1049,6 @@
   }
   .nx-prose p { max-width: 40rem; }
   .nx-form h2 { margin-top: 0.4rem; }
-  .nx-codeplate { display: grid; justify-items: center; gap: 0.4rem; text-align: center; }
-  .nx-codeplate .nx-glyph { width: 4rem; height: 4rem; }
 
   .nx-bullets {
     margin: 0.35rem 0 0.75rem;
@@ -1334,7 +1333,6 @@
     border-left: 2px solid transparent;
   }
   .nx-sidebtn[aria-current="page"] { border-left-color: var(--nx-red); background: var(--nx-soft); }
-  .nx-side-note { margin-top: auto; padding: 1rem 0.45rem 0; }
   .nx-tabbar { display: none; }
   .nx-column { height: 100dvh; }
   .nx-alarms { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1503,4 +1501,67 @@ html[data-motion="reduce"] .nx-fold {
 @media (forced-colors: active) {
   .nx-mark { display: none; }
   .nx-btn, .nx-row, .nx-choice { border: 1px solid ButtonText; }
+}
+
+/* Agency demonstrations use the existing NEXUS layout and theme tokens. */
+.civic-stack, .civic-view, .civic-field { display: grid; gap: .75rem; min-width: 0; }
+.civic-view { overflow-wrap: anywhere; }
+.civic-view h2, .civic-demo summary { font-weight: 700; }
+.civic-demo summary { cursor: pointer; min-height: 44px; align-content: center; }
+.civic-view .nx-btn, .civic-filters button, .civic-view input, .civic-view select { min-height: 44px; }
+.civic-view .nx-btn { white-space: normal; text-align: center; max-width: 100%; }
+.civic-filters button[aria-pressed="true"] { background: var(--nx-action); color: var(--nx-action-fg); border-color: var(--nx-action); }
+.civic-field :is(input:not([type="checkbox"]), select, textarea) { min-width: 0; max-width: 100%; }
+.civic-field label { font-weight: 600; }
+.civic-error { color: var(--nx-red); }
+.civic-bell { position: relative; }
+.civic-bell-count { position: absolute; top: 0; right: 0; font-size: .65rem; font-weight: 700; color: var(--nx-action-fg); background: var(--nx-action); border-radius: 999px; padding: 0 .3em; }
+.civic-form-actions, .civic-view .nx-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.civic-row-label { flex: 1; min-width: 0; }
+.civic-doc-body { white-space: pre-wrap; }
+.civic-view details > summary { cursor: pointer; }
+.civic-field input:not([type="checkbox"]) {
+  width: 100%;
+  background: var(--nx-bg);
+  border: 1px solid var(--nx-line);
+  border-radius: var(--nx-radius-control, 8px);
+  padding: .5rem .65rem;
+}
+.civic-field :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--nx-red); }
+.civic-field input[type="checkbox"] { width: 24px; min-height: 24px; }
+.civic-view .nx-sheet { min-width: 0; }
+
+
+.nx-top-identity {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .15rem .5rem;
+}
+.nx-top-identity .nx-brand {
+  flex: 1 1 max-content;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: .15rem .45rem;
+}
+.nx-top-identity .nx-brand strong { white-space: normal; overflow-wrap: anywhere; }
+.civic-field:has(input[type="checkbox"]) {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+}
+.civic-field:has(input[type="checkbox"]) label {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 44px;
+  align-content: center;
+  cursor: pointer;
+}
+.civic-field input[type="checkbox"] { grid-column: 1; grid-row: 1; }
+.civic-field:has(input[type="checkbox"]) .civic-error { grid-column: 2; }
+
+@media (max-width: 480px) {
+  .nx-top { gap: 4px; padding-inline: 8px; }
 }

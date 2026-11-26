@@ -31,7 +31,6 @@ export function DocumentList() {
       <PageHead
         kicker="Dokumenty i tożsamość"
         title="Dokumenty"
-        lede="Wzory, nie prawdziwe dokumenty. Każdy ma znak WZÓR i zostaje wyłącznie na tym urządzeniu."
       />
       <div className="nx-list">
         {DOCUMENTS.map((doc) => {
@@ -88,7 +87,6 @@ export function DocumentDetail({ id }: { id: string }) {
   const pruneShares = useNexus((s) => s.pruneShares);
   const reportLost = useNexus((s) => s.reportLost);
   const showToast = useNexus((s) => s.showToast);
-  const [codeOn, setCodeOn] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [lostOpen, setLostOpen] = useState(false);
   const [nowMs, setNowMs] = useState(() => Date.now());
@@ -154,9 +152,8 @@ export function DocumentDetail({ id }: { id: string }) {
 
       {activeShare.active ? (
         <div className="nx-note">
-          <p className="nx-kicker">Czasowy podgląd lokalny (nie udostępnienie zewnętrzne)</p>
           <p>
-            Podgląd aktywny jeszcze przez <strong>{activeShare.minutesRemaining} min</strong>. Po czasie wyłączy się automatycznie. Nie generuje prawdziwego kodu QR.
+            Podgląd na tym urządzeniu jest aktywny jeszcze przez <strong>{activeShare.minutesRemaining} min</strong>.
           </p>
           <button
             type="button"
@@ -172,31 +169,13 @@ export function DocumentDetail({ id }: { id: string }) {
       ) : null}
 
       <div className="nx-actions">
-        <button
-          type="button"
-          className="nx-btn nx-btn-primary"
-          disabled={isLost}
-          onClick={() => setCodeOn((value) => !value)}
-        >
-          <Glyph name="code" /> {codeOn ? "Ukryj kod wzoru" : "Pokaż kod wzoru"}
-        </button>
-        <button type="button" className="nx-btn" disabled={isLost} onClick={() => setShareOpen(true)}>
+        <button type="button" className="nx-btn nx-btn-primary" disabled={isLost} onClick={() => setShareOpen(true)}>
           <Glyph name="share" /> Podgląd na 15 minut
         </button>
         <button type="button" className="nx-btn" disabled={isLost} onClick={() => setLostOpen(true)}>
           <Glyph name="alert" /> Zgłoś utratę
         </button>
       </div>
-
-      {codeOn ? (
-        <div className="nx-codeplate">
-          <Glyph name="code" />
-          <strong>NX-15-WZÓR</strong>
-          <p className="nx-fine">
-            Znak zastępczy prototypu. Nie jest prawdziwym kodem QR ani poświadczeniem urzędowym.
-          </p>
-        </div>
-      ) : null}
 
       {relatedLinks.length > 0 ? (
         <section>
@@ -219,7 +198,7 @@ export function DocumentDetail({ id }: { id: string }) {
         open={shareOpen}
         onOpenChange={setShareOpen}
         title="Włączyć lokalny podgląd na 15 minut?"
-        body="To wyłącznie czasowy podgląd na tym urządzeniu — nie wysyłamy danych i nie tworzymy kodu QR. Zdarzenie zapisze się w historii wglądu oraz na osi czasu."
+        body="Podgląd działa tylko na tym urządzeniu. Włączenie zapisze się na osi czasu."
         confirm="Włącz na 15 minut"
         onConfirm={() => {
           shareDoc(doc.id, 15);
@@ -231,12 +210,11 @@ export function DocumentDetail({ id }: { id: string }) {
         open={lostOpen}
         onOpenChange={setLostOpen}
         title="Zgłosić utratę tego wzoru?"
-        body="W prawdziwej usłudze zgłoszenie unieważnia dokument. Tutaj zmienimy tylko status w prototypie, wyłączymy podgląd i zapiszemy zdarzenie w bezpieczeństwie oraz na osi czasu."
+        body="Symulacja zmieni status wzoru i wyłączy jego lokalny podgląd."
         confirm="Zgłoś utratę"
         danger
         onConfirm={() => {
           reportLost(doc.id);
-          setCodeOn(false);
           showToast("Zgłoszono utratę w prototypie — zobacz Ochronę tożsamości");
         }}
       />

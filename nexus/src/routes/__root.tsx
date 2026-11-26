@@ -9,7 +9,7 @@ import "@fontsource/ibm-plex-serif/latin-400.css";
 import "@fontsource/ibm-plex-serif/latin-ext-400.css";
 import "@fontsource/ibm-plex-serif/latin-500.css";
 import "@fontsource/ibm-plex-serif/latin-ext-500.css";
-import appCss from "../styles.css?url";
+import "../styles.css";
 
 const THEME_BOOT = `(function(){try{var raw=localStorage.getItem("nexus-pref");if(!raw)return;var st=JSON.parse(raw).state||{};var r=document.documentElement;if(st.theme)r.dataset.theme=st.theme;if(st.textScale)r.style.setProperty("--nx-scale",String(st.textScale));if(st.motion==="reduce")r.dataset.motion="reduce";}catch(e){}})();`;
 
@@ -30,10 +30,7 @@ export const Route = createRootRoute({
       },
       { name: "theme-color", content: "#f5f7fb" },
     ],
-    links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
-      { rel: "stylesheet", href: appCss },
-    ],
+    links: [{ rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }],
   }),
   component: () => (
     <html lang="pl" suppressHydrationWarning>

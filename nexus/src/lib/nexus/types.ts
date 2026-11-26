@@ -23,7 +23,9 @@ export type ViewId =
   | "uslugi"
   | "zdrowie"
   | "kierowca"
-  | "profil";
+  | "profil"
+  | "urzad"
+  | "powiadomienia";
 
 export type HubId = "zdrowie" | "kierowca" | "dokumenty" | "sprawy" | "wsparcie";
 

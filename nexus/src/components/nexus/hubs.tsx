@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { searchKey } from "@/lib/nexus/civic/model";
 import {
   DOCUMENTS,
   HEALTH_REFERRAL_SAMPLE,
@@ -12,16 +13,10 @@ import { selectCaseById, selectDerivedCases } from "@/lib/nexus/oneflow";
 import { HUBS, servicesByCategory } from "@/lib/nexus/registry";
 import { useNexus } from "@/lib/nexus/store";
 import type { HubId } from "@/lib/nexus/types";
+import { ZusHealthSource } from "./civic/zus";
 import { Glyph } from "./glyph";
 import { Watermark } from "./heritage";
-import { PageHead, Row, Status } from "./ui";
-
-const AVAIL: Record<string, string> = {
-  native: "w tym prototypie",
-  simulated: "symulacja, bez połączenia z urzędem",
-  external: "oficjalny serwis poza prototypem",
-  concept: "koncepcja, bez zgłaszania zdarzeń",
-};
+import { PageHead, Row } from "./ui";
 
 export function ServiceCatalog() {
   const go = useNexus((s) => s.go);
@@ -29,16 +24,16 @@ export function ServiceCatalog() {
   const [hubFilter, setHubFilter] = useState<"all" | HubId>("all");
 
   const groups = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const q = searchKey(query.trim());
     return servicesByCategory()
       .map((group) => ({
         ...group,
         items: group.items.filter((item) => {
           if (hubFilter !== "all" && item.hub !== hubFilter) return false;
           if (!q) return true;
-          return `${item.name} ${item.description} ${item.category} ${item.scopeNote}`
-            .toLowerCase()
-            .includes(q);
+          return searchKey(
+            `${item.name} ${item.institution} ${item.description} ${item.category} ${item.scopeNote}`,
+          ).includes(q);
         }),
       }))
       .filter((group) => group.items.length > 0);
@@ -46,17 +41,15 @@ export function ServiceCatalog() {
 
   return (
     <div className="nx-stage">
-      <PageHead
-        kicker="Katalog usług"
-        title="Wszystkie usługi"
-        lede="Pięć spójnych obszarów z rozpoznawalnymi nazwami mObywatela. Każda usługa jawnie oddziela prototyp od oficjalnego serwisu."
-      />
+      <PageHead title="Wszystkie usługi" />
       <label className="nx-searchpill nx-searchpill-field">
         <Glyph name="search" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Szukaj usługi, sprawy, dokumentu…"
+          type="search"
+          aria-label="Szukaj usługi"
+          placeholder="Szukaj usługi"
         />
       </label>
       <div className="nx-filters" role="tablist" aria-label="Obszary usług">
@@ -81,7 +74,19 @@ export function ServiceCatalog() {
         ))}
       </div>
       {groups.length === 0 ? (
-        <p className="nx-fine">Nic nie pasuje. Spróbuj „mojeIKP”, „pojazd” albo „e-Doręczenia”.</p>
+        <div className="nx-stack">
+          <p role="status">Brak usług pasujących do filtrów.</p>
+          <button
+            type="button"
+            className="nx-btn"
+            onClick={() => {
+              setQuery("");
+              setHubFilter("all");
+            }}
+          >
+            Wyczyść filtry
+          </button>
+        </div>
       ) : null}
       {groups.map((group) => (
         <section key={group.category}>
@@ -97,9 +102,7 @@ export function ServiceCatalog() {
                 <Glyph name={item.glyph} />
                 <span className="nx-row-copy">
                   <strong>{item.name}</strong>
-                  <small>
-                    {item.description} · {AVAIL[item.availability]}
-                  </small>
+                  <small>{item.description}</small>
                 </span>
                 <Glyph name="forward" className="nx-row-go" />
               </button>
@@ -167,11 +170,7 @@ export function HealthHub({ section }: { section?: string }) {
   return (
     <div className="nx-stage">
       <Watermark motif="lab" />
-      <PageHead
-        kicker="Zdrowie · mojeIKP"
-        title="Twoje zdrowie w jednym miejscu"
-        lede="Podgląd w prototypie bez porad medycznych i bez rezerwacji wizyt. Prawdziwe recepty i terminy obsługuje pacjent.gov.pl."
-      />
+      <PageHead kicker="Zdrowie · mojeIKP" title="Twoje zdrowie w jednym miejscu" />
 
       <div className="nx-filters" role="tablist" aria-label="Zakładki zdrowia">
         {(
@@ -225,7 +224,7 @@ export function HealthHub({ section }: { section?: string }) {
             </label>
           </div>
           <div className="nx-actions">
-            <button type="button" className="nx-btn nx-btn-primary" onClick={handleSaveReminder}>
+            <button type="button" className="nx-btn nx-btn-primary" disabled={!remDate || !remTime} onClick={handleSaveReminder}>
               <Glyph name="calendar" />{" "}
               {existing ? "Zmień termin przypomnienia" : "Zapisz przypomnienie"}
             </button>
@@ -257,29 +256,22 @@ export function HealthHub({ section }: { section?: string }) {
 
       {activeTab === "recepty" ? (
         <article className="nx-benefit">
-          <p className="nx-kicker">e-Recepty · brak danych w prototypie</p>
-          <h2>Brak aktywnych e-Recept w danych wzoru</h2>
-          <p>
-            Dla fikcyjnego profilu Zofii Baran nie zapisano żadnej e-Recepty. Prawdziwe recepty i kody realizacji sprawdzisz wyłącznie w oficjalnym mojeIKP.
-          </p>
+          <h2>Recepty</h2>
+          <p>Brak recept do wyświetlenia.</p>
           <a
             className="nx-btn nx-btn-primary"
             href="https://pacjent.gov.pl/internetowe-konto-pacjenta/erecepta"
             target="_blank"
             rel="noreferrer"
           >
-            Otwórz pacjent.gov.pl — e-Recepta (poza prototypem)
+            Sprawdź e-Recepty w pacjent.gov.pl
           </a>
         </article>
       ) : null}
 
       {activeTab === "wizyty" ? (
         <article className="nx-benefit">
-          <p className="nx-kicker">Wizyty i przypomnienia</p>
-          <h2>Prototyp nie umawia wizyt lekarskich</h2>
-          <p>
-            Możesz zapisać tutaj własne przypomnienie, żeby zadzwonić do rejestracji lub sprawdzić termin w oficjalnym serwisie.
-          </p>
+          <h2>Przypomnienia o wizytach</h2>
           {healthReminders.length > 0 ? (
             <div className="nx-list">
               {healthReminders.map((rem) => (
@@ -301,41 +293,40 @@ export function HealthHub({ section }: { section?: string }) {
             target="_blank"
             rel="noreferrer"
           >
-            Przejdź do pacjent.gov.pl (oficjalny serwis)
+            Sprawdź terminy w pacjent.gov.pl
           </a>
         </article>
       ) : null}
 
       {activeTab === "ubezpieczenie" ? (
-        <article className="nx-benefit">
-          <p className="nx-kicker">Ubezpieczenie zdrowotne · ważna różnica</p>
-          <h2>EKUZ nie potwierdza ubezpieczenia w Polsce</h2>
-          <p>
-            Karta EKUZ widoczna w portfelu wzorów służy wyłącznie do korzystania z niezbędnych świadczeń podczas pobytu w państwach UE/EFTA. Status ubezpieczenia zdrowotnego w Polsce potwierdzają systemy eWUŚ, NFZ oraz ZUS.
-          </p>
-          <div className="nx-actions">
-            <button type="button" className="nx-btn" onClick={() => go("dokument", "ekuz")}>
-              <Glyph name="health" /> Otwórz kartę EKUZ (wzór)
-            </button>
-            <a
-              className="nx-btn"
-              href="https://pacjent.gov.pl/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Sprawdź w pacjent.gov.pl
-            </a>
-          </div>
-        </article>
+        <div className="nx-stack">
+          <ZusHealthSource compact />
+          <article className="nx-benefit">
+            <h2>Europejska Karta Ubezpieczenia Zdrowotnego</h2>
+            <p>EKUZ potwierdza prawo do niezbędnych świadczeń podczas czasowego pobytu za granicą.</p>
+            <div className="nx-actions">
+              <button type="button" className="nx-btn" onClick={() => go("dokument", "ekuz")}>
+                <Glyph name="health" /> Otwórz kartę EKUZ (wzór)
+              </button>
+              <a
+                className="nx-btn"
+                href="https://pacjent.gov.pl/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Sprawdź w pacjent.gov.pl
+              </a>
+            </div>
+          </article>
+        </div>
       ) : null}
 
       {activeTab === "upowaznienia" ? (
         <article className="nx-benefit">
-          <p className="nx-kicker">Upoważnienia medyczne vs osoba zaufana</p>
           <h2>Osobne uprawnienia w mojeIKP</h2>
           <p>
-            Osoba zaufana w tym prototypie ({TRUSTED.name} — obecnie{" "}
-            <strong>{trustedOn ? "włączona" : "wyłączona"}</strong>) dotyczy wyłącznie lokalnego odbioru pism w prototypie. Nie daje dostępu do dokumentacji medycznej ani e-Recept w mojeIKP.
+            Upoważnienia do dokumentacji i recept ustawisz w mojeIKP. Osoba zaufana w NEXUS
+            ({TRUSTED.name}) dotyczy pism. Status: <strong>{trustedOn ? "włączona" : "wyłączona"}</strong>.
           </p>
           <div className="nx-actions">
             <button type="button" className="nx-btn" onClick={() => go("zaufana")}>
@@ -362,7 +353,7 @@ export function HealthHub({ section }: { section?: string }) {
         <a className="nx-tile" href="https://pacjent.gov.pl/" target="_blank" rel="noreferrer">
           <Glyph name="institution" />
           <strong>pacjent.gov.pl</strong>
-          <small>Oficjalne przejście, poza prototypem</small>
+          <small>Internetowe Konto Pacjenta</small>
         </a>
       </div>
     </div>
@@ -382,11 +373,7 @@ export function DriverHub({ section }: { section?: string }) {
 
   return (
     <div className="nx-stage">
-      <PageHead
-        kicker="Kierowca"
-        title="Pojazdy i uprawnienia"
-        lede="Osobne widoki dla mPrawa jazdy, Moich pojazdów, Punktów karnych i koncepcji mStłuczka. Dane w prototypie są fikcyjne."
-      />
+      <PageHead kicker="Kierowca" title="Pojazdy i uprawnienia" />
 
       <div className="nx-filters" role="tablist" aria-label="Zakładki kierowcy">
         <button
@@ -466,7 +453,6 @@ export function DriverHub({ section }: { section?: string }) {
           <h2>Aktualna liczba: {PENALTY_POINTS_SAMPLE.activePoints}</h2>
           <p>Punkty tymczasowe: {PENALTY_POINTS_SAMPLE.temporaryPoints}</p>
           <p>{PENALTY_POINTS_SAMPLE.checkedNote}</p>
-          <Status tone="ok">0 punktów w danych wzoru</Status>
           <div className="nx-actions">
             <button type="button" className="nx-btn" onClick={() => go("dokument", "prawojazdy")}>
               <Glyph name="wheel" /> Otwórz mPrawo jazdy
@@ -485,15 +471,9 @@ export function DriverHub({ section }: { section?: string }) {
 
       {activeTab === "stluczka" ? (
         <article className="nx-benefit">
-          <p className="nx-kicker">mStłuczka · wyłącznie koncepcja w tym prototypie</p>
-          <h2>Koncepcja oświadczenia sprawcy zdarzenia</h2>
-          <p>
-            „mStłuczka” jest prawdziwą nazwą usługi w ekosystemie mObywatela, lecz w tym prototypie konkursowym ma wyłącznie charakter koncepcyjny — nie sporządza ważnego oświadczenia i nie zgłasza szkody do ubezpieczyciela ani policji.
-          </p>
-          <ul className="nx-bullets">
-            <li>Jeżeli ktoś ucierpiał lub droga jest zablokowana — zadzwoń pod 112.</li>
-            <li>W prototypie nie przesyłamy zdjęć, lokalizacji ani danych drugiego kierowcy.</li>
-          </ul>
+          <h2>mStłuczka</h2>
+          <p>Oświadczenie o zdarzeniu sporządzisz w oficjalnej usłudze mObywatel.</p>
+          <p>W razie zagrożenia życia lub bezpieczeństwa zadzwoń pod 112.</p>
           <div className="nx-actions">
             <a className="nx-btn nx-btn-danger" href="tel:112">
               <Glyph name="emergency" /> Zadzwoń 112 (numer alarmowy)

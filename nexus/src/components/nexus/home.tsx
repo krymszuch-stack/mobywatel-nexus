@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { activeCivicTasks, useCivicData } from "@/lib/nexus/civic/select";
+import { TaskRows } from "./civic/ui";
 import { LETTERS } from "@/lib/nexus/data";
 import { getActivePersona } from "@/lib/nexus/demo-stories";
 import { greeting, longDate } from "@/lib/nexus/format";
@@ -29,6 +31,7 @@ export function Home() {
     (item) => item.id !== "notif-letters" && !item.id.startsWith("notif-rem-"),
   );
 
+  const civicTasks = useCivicData().flatMap(activeCivicTasks);
   const persona = getActivePersona(state.activePersona);
 
   return (
@@ -111,6 +114,11 @@ export function Home() {
         <Dense go={go} waiting={waiting.length} activeCases={activeCases} />
       ) : null}
 
+      {civicTasks.length > 0 && <section className="civic-stack">
+        <h2>Zadania w usługach</h2>
+        <TaskRows tasks={civicTasks.slice(0, mode === "simple" ? 1 : 3)} />
+        <button className="nx-btn" type="button" onClick={() => go("sprawy")}>Wszystkie zadania i sprawy</button>
+      </section>}
       {reminders.length > 0 ? (
         <section>
           <p className="nx-kicker nx-section">Przypomnienia</p>
